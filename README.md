@@ -1,3 +1,3 @@
-C#
-# tsvetaevAlex-Sockets
-Drafts of my attempts to work with Devices using socket connection Drafts of my attempts to work with Devices using socket connection
+# Sockets
+my attempts to implement ssh socket client
+C# .net 6.0
