@@ -8,6 +8,8 @@ public class CameraTestSuite : TestSuiteHelper
     public static Destination TargetDeviceData;
     public Device GeneralTargetDevice;
     protected int CameraPort = 4030;
+    protected int ModemPort = 4099;
+
     public static void Main(string[] args)
     {
         Console.WriteLine("Hello, World!");

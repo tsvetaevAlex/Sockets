@@ -6,13 +6,8 @@ namespace CameraTests;
 
 public class Device : CameraTestSuite
 { 
-
-
-    public int CameraPort = 4030;
-    public int ModemPort = 4099;
     private int AttemptCount = 0;
     private int MAXattemptsQTY = 5;
-
 
     public Destination DeviceData { get;  set; }
 
