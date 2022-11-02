@@ -1,0 +1,54 @@
+<Playlist Version="2.0">
+  <Rule Name="Includes" Match="Any">
+    <Rule Match="All">
+      <Property Name="Solution" />
+      <Rule Match="Any">
+        <Rule Match="All">
+          <Property Name="Project" Value="automation" />
+          <Rule Match="Any">
+            <Rule Match="All">
+              <Property Name="Namespace" Value="simicon.automation" />
+              <Rule Match="Any">
+                <Rule Match="All">
+                  <Property Name="Class" Value="TestSuite" />
+                  <Rule Match="Any">
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="simicon.automation.TestSuite.PrepareEvironment" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="PrepareEvironment" />
+                      </Rule>
+                    </Rule>
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="simicon.automation.TestSuite.UpdateCamPropertyTest" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="UpdateCamPropertyTest" />
+                      </Rule>
+                    </Rule>
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="simicon.automation.TestSuite.VerifyCamPropertyTest" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="VerifyCamPropertyTest" />
+                      </Rule>
+                    </Rule>
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="simicon.automation.TestSuite.RestartService" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="RestartService" />
+                      </Rule>
+                    </Rule>
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="simicon.automation.TestSuite.ct005_GetShapShot" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="ct005_GetShapShot" />
+                      </Rule>
+                    </Rule>
+                  </Rule>
+                </Rule>
+              </Rule>
+            </Rule>
+          </Rule>
+        </Rule>
+      </Rule>
+    </Rule>
+  </Rule>
+</Playlist>
