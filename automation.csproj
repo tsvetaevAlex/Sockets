@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="ReportFolder\**" />
+    <Compile Remove="Tests\ATJ\**" />
+    <Compile Remove="Tests\ATSZ\**" />
+    <EmbeddedResource Remove="ReportFolder\**" />
+    <EmbeddedResource Remove="Tests\ATJ\**" />
+    <EmbeddedResource Remove="Tests\ATSZ\**" />
+    <None Remove="ReportFolder\**" />
+    <None Remove="Tests\ATJ\**" />
+    <None Remove="Tests\ATSZ\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="CommandHelper - Copy.cs" />
+    <Compile Remove="Destination.cs" />
+    <Compile Remove="Helper - bwckup 11-7-20222-19 before rollbeck to 10-28Copy.cs" />
+    <Compile Remove="TestEnvironment.cs" />
+    <Compile Remove="TestSuiteHelper.cs" />
+    <Compile Remove="Tests\CameraTest.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Extensions.Logging.NUnit" Version="1.0.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
+    <PackageReference Include="NUnit" Version="3.13.3" />
+    <PackageReference Include="NUnit.Console" Version="3.16.0" />
+    <PackageReference Include="NUnit.ConsoleRunner" Version="3.16.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
+    <PackageReference Include="NUnit.Analyzers" Version="3.3.0" />
+    <PackageReference Include="coverlet.collector" Version="3.1.2" />
+    <PackageReference Include="Renci.SshNet.Async" Version="1.4.0" />
+    <PackageReference Include="SSH.NET" Version="2020.0.2" />
+    <PackageReference Include="System.Linq.Expressions" Version="4.3.0" />
+    <PackageReference Include="Xamarin.Forms" Version="5.0.0.2515" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Tests\" />
+  </ItemGroup>
+
+</Project>
