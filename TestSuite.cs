@@ -1,57 +1,34 @@
 using automation;
 
 namespace simicon.automation;
-public class TestSuite
+public static class TestSuite
 {
-    public TestSuite() { }
-
-    protected string Host = "192.168.10.102";
-    protected string Login = "root";
-    protected string Passwword = "test";
-    protected string prefix = ">>>>>>>>>>>>>>>>>>>>>>";
-    protected Helper _helper;
-    protected Camera _camera;
-    protected Device _device;
-
-
+    public static string Host = "192.168.10.102";
+    public static string Login = "root";
+    public static string Passwword = "test";
+    public static string prefix = ">>>>>>>>>>>>>>>>>>>>>>";
 
     [Test, Order(1)]
-    public void PrepareEvironment()
+    public static void PrepareEvironment()
     {
         Console.WriteLine("\n<============================[ PrepareEvironment Srarted ]============================");
-        _device = new Device(
-            ip: "192.168.10.102",
-            lohinname: "root",
-            pswd: "test");
-        _helper = _device._helper;
+        ConnectionPointers.InitConnectionPointers("192.168.10.102","root","test");
+        Sensorapp.Prepare();
+
+        #region Camera Test. placed here during debbug period. will be extrscted to [Test, Order(2)]
+        //CameraTest.atjTestWithInRange();
+        #endregion
     }
 
-
-    public Helper GetHelper()
-    {
-        return _helper;
-    }
-
-
-    public Camera GetCamera()
-    {
-        return _camera;
-    }
-
-
-    public Device GetDevice()
-    {
-        return _device;
-    }
-
-    /*
     [Test, Order(2)]
-    public void ct001_GetDefaultSnapshot()
+    public static void at002ATSF_TestWithInRange([Range(-5300, 5300, 100)] int number)
     {
-        _camera = _device.GetCamera();
-        _camera.Conect();
-        _camera.CreateSnapshot();
-        _camera.GetSnapshot("default.jpg");
+        //System.Threading.Thread.Sleep(500);
+        string ATcomand = "ATJ=" + number;
+            Helper.StringExecute(ATcomand, ConnectionPointers.CameraSocket);
+        Console.WriteLine($"Command to RUn: {ATcomand}.");
+            if (Camera.CreateSnapshot())
+                Camera.GetSnapshot("C:\\SnapShots\\" + ATcomand + ".jpg");
+
     }
-    */
 }//end of class TestSuite

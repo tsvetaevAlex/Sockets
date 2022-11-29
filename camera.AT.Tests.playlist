@@ -1,0 +1,48 @@
+<Playlist Version="2.0">
+  <Rule Name="Includes" Match="Any">
+    <Rule Match="All">
+      <Property Name="Solution" />
+      <Rule Match="Any">
+        <Rule Match="All">
+          <Property Name="Project" Value="simicon.automation" />
+          <Rule Match="Any">
+            <Rule Match="All">
+              <Property Name="Namespace" Value="simicon.automation.camera.Tests.AT" />
+              <Rule Match="Any">
+                <Rule Match="All">
+                  <Property Name="Class" Value="VerifyCameraSuite" />
+                  <Rule Match="Any">
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="simicon.automation.camera.Tests.AT.VerifyCameraSuite.PrepareEnvironment" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="PrepareEnvironment" />
+                      </Rule>
+                    </Rule>
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="simicon.automation.camera.Tests.AT.VerifyCameraSuite.VerifyATB" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="VerifyATB" />
+                      </Rule>
+                    </Rule>
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="simicon.automation.camera.Tests.AT.VerifyCameraSuite.VerifyATG" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="VerifyATG" />
+                      </Rule>
+                    </Rule>
+                    <Rule Match="All">
+                      <Property Name="TestWithNormalizedFullyQualifiedName" Value="simicon.automation.camera.Tests.AT.VerifyCameraSuite.VerifyATJ" />
+                      <Rule Match="Any">
+                        <Property Name="DisplayName" Value="VerifyATJ" />
+                      </Rule>
+                    </Rule>
+                  </Rule>
+                </Rule>
+              </Rule>
+            </Rule>
+          </Rule>
+        </Rule>
+      </Rule>
+    </Rule>
+  </Rule>
+</Playlist>

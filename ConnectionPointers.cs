@@ -1,56 +1,63 @@
 ﻿using Renci.SshNet;
-using System.Runtime.CompilerServices;
+
 namespace simicon.automation;
 
-public class ConnectionPointers
+public static class ConnectionPointers
     {
-    public string Host;
-    public string Login;
-    public string Password;
-    public SshClient SshSocket;
-    public SftpClient SftpSocket;
-    public ShellStream SshDataChannel;
-    public string prefix = ">>>>>>>>>>>>>>>>>>>>>>";
+    public static string Host;
+    public static string Login;
+    public static string Password;
+    public static SshClient SshSocket;
+    public static SshClient CameraSocket;
+    public static ShellStream SshCameraStream;
+    public static SftpClient SftpSocket;
+    public static ShellStream SshDataChannel;
+    public static string prefix = ">>>>>>>>>>>>>>>>>>>>>>";
 
-    public ConnectionPointers() { }
-        public ConnectionPointers(string host, string loginname, string pswd)
+        public static void InitConnectionPointers(string host, string loginname, string pswd)
         {
-        Console.WriteLine("!!!!!!!!!!!!!!Checkpoint Connectionpointers param onstrcutors");
+            Host = host;
+            Login = loginname;
+            Password = pswd;
+        Console.WriteLine("\n<----------------------------[ InitSshConnection->DEvice ]-------------------------------->");
+            SshSocket = InitSshConnection(host, loginname, pswd);
+            SftpSocket = InitSftpConnection(host, loginname, pswd);
+        Console.WriteLine("\n<----------------------------[ InitSshConnection->DEvice.Camera ]------------------------->");
+        CameraSocket = InitSshConnection(host, loginname, pswd);
+        ShellStream SshCameraStream = SshSocket.CreateShellStream("", 0, 0, 0, 0, 0);
+        Console.WriteLine("\n<----------------------------[ DEvice.Camera Connetion]----------------------------------->");
+        Camera.Conect();
+        //Envelope dataPack = new Envelope
+        //(
+        //    testname: "Verify Landing page on Connection",
+        //    request: "pwd",
+        //    expectedContent: "/root",
+        //    vt: VerificationType.Equal
+        //);
+            Console.WriteLine("{0} SSH Client: {1};", prefix, SftpSocket.ToString());
 
-                Host = host;
-                Login = loginname;
-                Password = pswd;
-                SshSocket = InitSshConnection(host, loginname, pswd);
-                SftpSocket = InitSftpConnection(host, loginname, pswd);
-        }
-
-    public ConnectionPointers GetConnectionPointers()
-    {
-        return this;
     }
 
 
-        private SshClient InitSshConnection(string ip, string lohinname, string pswd)
+    private static SshClient InitSshConnection(string ip, string lohinname, string pswd)
         {
-        Console.WriteLine("!!!!!!!!!!!!!!Checkpoint ConnectionPointers.InitSshConnection");
-
-        #region create SSH connection with device
-        //[System.Runtime.CompilerServices.CallerMemberName] string memberName = "",
-
-        try
-        {
+    #region create SSH connection with device
+            try
+            {
                 SshClient sshCLient = new SshClient(ip, lohinname, pswd);
                 Console.WriteLine("{0} SSH Client: {1};", prefix, sshCLient.ToString());
-                this.SshSocket = sshCLient;
+                ConnectionPointers.SshSocket = sshCLient;
 
-            }
-            catch (Exception e)
+
+
+        }
+        catch (Exception e)
             {
                 Console.WriteLine(prefix + "Exception in GetConnection line 26[SshClient sshCLient = new SshClient]: exceptiom{0}", e.Message);
             }
         SshSocket.Connect();
         ShellStream stream = SshSocket.CreateShellStream("", 0, 0, 0, 0, 0);
-        this.SshDataChannel = stream;
+        ConnectionPointers.SshDataChannel = stream;
 
         #region wait for connection acknowledgment
             while (true)
@@ -66,21 +73,20 @@ public class ConnectionPointers
                     break;
                 }
             }
+
         #endregion
         #endregion
         return SshSocket;
-    }// End of initConnection
+        }// End of initConnection
 
 
 
-    private SftpClient InitSftpConnection(string ip, string lohinname, string pswd)
+    private static SftpClient InitSftpConnection(string ip, string lohinname, string pswd)
     {
-        Console.WriteLine("!!!!!!!!!!!!!!Checkpoint ConnectionPointers.InitSftpConnection");
-
         #region create SCP connection with Device
         SftpClient sftp = new SftpClient(ip, lohinname, pswd);
         SftpSocket = sftp;
-        SftpSocket.Connect();
+        ConnectionPointers.SftpSocket.Connect();
         #endregion
         return sftp;
     }

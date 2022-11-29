@@ -2,5 +2,6 @@
 {
     Equal,
     Contains,
-    None
+    None,
+    NoResp
 }

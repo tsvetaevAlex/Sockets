@@ -1,98 +1,226 @@
 ﻿using System.Diagnostics;
+using System.Runtime.Intrinsics.X86;
+using System.Xml;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
+using NUnit.Framework.Internal;
 using Renci.SshNet;
+using Renci.SshNet.Security.Cryptography;
+using simicon.automation;
 using Xamarin.Forms;
+using System.IO;
+using Xamarin.Forms.Shapes;
+using System.Net.WebSockets;
+using System.Linq;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+using static System.Net.Mime.MediaTypeNames;
+using System.Text;
+using static System.Net.WebRequestMethods;
 using File = System.IO.File;
+using System.Security.Cryptography.X509Certificates;
 
 namespace simicon.automation;
 
-public class Helper
-{    //Commands executor ans others tuff
-
-    public ConnectionPointers _Connections;
-
-    public Helper(Device argdevice)
+public static class Helper
+//execute Command
+{
+    public static string outupFolder = "C:\\SnapShots";
+    public static string prefix = "---------------------------------------->";
+    private static string requestOutput = "";
+    private static int _ExitStatus = 1;
+    /// <summary>
+    /// <param name="filename">Snapshot filename of new local file</param>
+    public static void GetSnapdhot(string filename)
     {
+        string host = ConnectionPointers.Host;
+        string username = ConnectionPointers.Login;
+        string password = ConnectionPointers.Password;
+        string localFileName = System.IO.Path.GetFileName(filename);
+        string remoteDirectory = "/tftpboot/boot/";
+        string reportDir = "C:\\SnapShots";
+        ConnectionPointers.SftpSocket.Connect();
+        ConnectionPointers.SftpSocket.ChangeDirectory(remoteDirectory);
 
-        Console.WriteLine("!!!!!!!!!!!!!!Checkpoint Helper constructor with Device");
+        Console.WriteLine("outputFolder: {0}", reportDir);
+        //Stream ouputFile = File.Open(outputFilePath, FileMode.OpenOrCreate);
+        Stream ouputFile = File.Create(outupFolder + filename);
+        ConnectionPointers.SftpSocket.DownloadFile("1.jpg", ouputFile);
 
 
-        _Connections = argdevice.GetConnectionPointers();
+
+
+        //FileStream imageStream = 
+        //var ImageStream = new FileStream(localdir, FileMode.Create);
+
+        //string remotePath = "/tftpboot/boot/1.jpg";
+        //ConP.ScpSocket.Download(remotePath, ImageStream);
+
+        //Console.WriteLine(prefix + "cat /tftpboot/boot/1.jpg");
+        //var Responsedata = cmd.Execute();
+        //var output = cmd.Result;
+        //int stat = cmd.ExitStatus;
+        //Console.WriteLine(prefix + "ExitStatus: {0}", stat);
+        //Console.WriteLine(prefix + "Result: {0}", output);
+        //Console.WriteLine(prefix + "ResponseData: {0}", Responsedata);
+        //DirectoryInfo solutionPath = GetSolutionDirectory();
+        //string imagePath = solutionPath.FullName + "/ReportFolder/ct006.jpg";
+        ////byte[] byteData = Encoding.ASCII.GetBytes(output);
+        //File.AppendAllText(imagePath, output);
+
     }
-    public Helper(ConnectionPointers connections)
+    public static void StringExecute(string message)
     {
-        Console.WriteLine("!!!!!!!!!!!!!!Checkpoint Helper constructor with ConnectionPointers");
-        _Connections = connections;
+        prefix = $"Helper:StringExecute:> {message};";
+        Envelope query = new Envelope(
+                testname: "just a string comand execution on socket",
+                request: message,
+                expectedContent: "",
+                vt: VerificationType.None
+        );
+        EnvelopeExecute(query);
     }
-
-    public void Execute(Envelope ComData)
+    public static void StringExecute(string message, SshClient _socket)
     {
-        Debug.WriteLine(">>>>>>>>>>>>>>>>>>>>>> ExecuteCommand");
-        Debug.WriteLine(">>>>>>>>>>>>>>>>>>>>>> Command: {0}", ComData.messageToSend);
+        prefix = $"Helper:StringExecute:> {message};";
+        Envelope query = new Envelope(
+                testname: "just a string comand execution on socket",
+                request: message,
+                expectedContent: "",
+                vt: VerificationType.None,
+                socket: _socket
+        );
+        EnvelopeExecute(query);
+    }
+    public static void StringExecute(string message, VerificationType vt)
+    {
+        prefix = $"Helper:StringExecute:> {message};";
+        Envelope query = new Envelope(
+                request: message,
+                vt: vt
+        );
+        EnvelopeExecute(query);
+    }
+    public static void EnvelopeExecute(Envelope ComData)
+    {
+        string RequestMsg = ComData.messageToSend;
+        prefix = "Helper:EnvelopeExecute:> ";
+        Debug.WriteLine(prefix + "ExecuteCommand");
+        Debug.WriteLine(prefix + "Command: {0}", RequestMsg);
 
         string TAG = ComData.testName;
-        string output = "";
-        int stat;
+
 
         // all in using{} on out from using {} all allocated memory will be released
-        var cmd = _Connections.SshSocket.CreateCommand(ComData.messageToSend);
+        using (var cmd = ConnectionPointers.CameraSocket.CreateCommand(ComData.messageToSend))
         {
-            Debug.WriteLine("<============================[ START RunCommand ]============================>");
-            Debug.WriteLine($"<====[ {ComData.messageToSend} ]====>");
-            try
-            {
-                while (true)
+            Console.WriteLine("<============================[ RunCommand ]============================>");
+            Console.WriteLine($"<====[ Test name: {ComData.testName} ]====>");
+            Console.WriteLine($"<====[ messageToSend: {ComData.messageToSend} ]====>");
+                try
                 {
-                    var CmdReturned = cmd.Execute();
-                    output = cmd.Result;
-                    if (cmd.ExitStatus != 0)
+                    var returned = cmd.Execute();
+                    var _output = cmd.Result;
+                    Console.WriteLine($" Helper:CodeLine 106; Output before Trim: {_output}");
+                    if (ComData.testName == "CamTest_picocom_vonnection")
                     {
-                        break;
+                        Console.WriteLine("<============================[ CamTest_picocom_vonnection ]============================>");
+                        Console.WriteLine(_output);
                     }
-                    output = output.Trim('\n');
+
+                    if (_output.Contains('\n'))
+                    {
+                        _output = _output.Trim('\n');
+                    }
+                    if (_output.Contains("ERR"))
+                    {
+                        Assert.Fail($"Request: {RequestMsg}, Failed due to ERR message received");
+                        outupFolder = "\"C:\\\\SnapShots\\Failed";
+                    }
+                    Console.WriteLine($" Helper:CodeLine 112; Output After Trim: {_output}");
+                    requestOutput = _output;
+                    string prefix = Helper.prefix;
+                    Console.WriteLine("\n" + prefix + $" Helper:CodeLine 115; requestOutput: '{0}'", requestOutput);
+                    _ExitStatus = cmd.ExitStatus;
+                    Console.WriteLine(prefix + $" Helper:CodeLine 117; ExitStatus: {0}", _ExitStatus);
+                    var err = cmd.Error;
+                } //try
+                catch (Exception e)
+                {
+                    Assert.Fail("<==========================Exceptioon in RunCommand: {0}", e.Message);
+                    //Logger.Warn("Exception extracting archive: " + e.Message);
                 }
-                Debug.WriteLine("\n" + ">>>>>>>>>>>>>>>>>>>>>>" + "Output: '{0}'", output);
-                stat = cmd.ExitStatus;
-                Debug.WriteLine(">>>>>>>>>>>>>>>>>>>>>>" + "ExitStatus: {0}", stat);
-                var err = cmd.Error;
-                Debug.WriteLine("\nOutput: {0}", cmd.Result);
-                Debug.WriteLine($"\n<=================================Exit status: [{stat}] ");
-            } //try
-            catch (Exception e)
-            {
-                Assert.Fail("<==========================Exceptioon in RunCommand: {0}", e.Message);
-            }
             #region Verify output
             // if verification type is None, e will check only Exit Status should 0 to PASS
-            Debug.WriteLine("<============================[ verify Results ]============================>");
-            Debug.WriteLine($">>>>>>>>>>>>>>>>>>>>>ACTUAL  Content: {cmd.Result}");
-            Debug.WriteLine($">>>>>>>>>>>>>>>>>>>>>EXPECTED Content: {ComData.expectedResponseContent}");
-            Debug.WriteLine($">>>>>>>>>>>>>>>>>>>>> Comparison Type: {ComData.VerT}");
+            Console.WriteLine($" Helper:CodeLine 136; Actual result: {requestOutput}");
+            Console.WriteLine($" Helper:CodeLine 137; Expected result: {ComData.expectedResponseContent}");
 
-            switch (ComData.VerT)
-            {
+            int VerificationResult = 0;
+
+                switch (ComData.VerT)
+                {
                 case VerificationType.Equal:
                     {
-                        Assert.IsTrue(output.Equals(ComData.expectedResponseContent));
-                        Debug.WriteLine($">>>>>>>>>>>>>>>>>>>>> Equal verification PASSED");
+                        Console.WriteLine($"Verification Type [Equals]");
+                        Assert.IsTrue(requestOutput.Equals(ComData.expectedResponseContent));
+                        VerificationResult = 1;
+                        Console.WriteLine($"Verification Type [Equals]: PASSED");
+
                         break;
                     }
                 case VerificationType.Contains:
                     {
-                        Assert.IsTrue(output.Contains(ComData.expectedResponseContent));
-                        Debug.WriteLine($">>>>>>>>>>>>>>>>>>>>> Contains verification PASSED");
+                        Console.WriteLine($"Verification Type [Contains]");
+                        Assert.IsTrue(requestOutput.Contains(ComData.expectedResponseContent));
+                        VerificationResult = 1;
+                        Console.WriteLine($"Verification Type [Contains]: PASSED");
+
                         break;
                     }
                 case VerificationType.None:
+                {
+                    Console.WriteLine($"Verification Type [None]");
+
+                    if (requestOutput.Contains(ComData.expectedResponseContent)
+                        && _ExitStatus.Equals(0))
                     {
-                        Assert.IsTrue(cmd.ExitStatus.Equals(0));
+                        bool result = true;
+                        Assert.IsTrue(result);
+                        VerificationResult = -1;
+                        Console.WriteLine($"Verification Type [ExitStatus is 0]: PASSED");
+                    }//if
+                    break;
+                }//case
+                case VerificationType.NoResp: { break; }
+
+                }// end of switch VerificationType
+
+                switch (VerificationResult)
+                { 
+                case 0:
+                    {
+                        Console.WriteLine("Verification Result is FALSE");
                         break;
                     }
-                default: { break; }
-            }
-            #endregion
+                case 1:
+                    {
+                        Console.WriteLine("Verification Result is TRUE");
+                        break;
+                    }
+                case -1:
+                    {
+                        Console.WriteLine("Verification Result is NONE, due-to it was request with no expected response");
+                        break;
+                    }
+                }// end of switch VerificationResult
 
-        }// var cmd =
-    }// end of Execute
+        }
+        #endregion
+
+            //Console.WriteLine("<============================[ RunCommand ]============================>");
+            //Console.WriteLine($"<====[Reset Consolr Buffer ]====>");
+
+            //var ResetCommand = ConnectionPointers.SshSocket.CreateCommand("Reset");
+            //var ResetResult = ResetCommand.Execute();
+            //Console.WriteLine($"\n<=================================Exit status: {ResetCommand.ExitStatus}.");
+
+        }//end of using
 }// end of class
-
