@@ -14,8 +14,6 @@ internal class ATG
     {
         Logger.Write("ATG: start verification of AT command ATG", "ATG");
         TestCase.Run("ATG", "GAIN");
-        
     }
-
 }
 

@@ -146,6 +146,26 @@ public static class Camera
         }
     }//getSnaphot
 
+    public static void RequestProcessing<T>(T connection, string expectedConTent, String TAG)
+    {
+        //1 for sshClient  work with 
+        //using (var cmd = ConnectionPointers.SshSocket.CreateCommand(ATcommand))
+        //cmd.Execute();
+        //2to work with ShellStream, ONLY strings applicable.
+        int socketWorkflowLogic;
+
+        if (connection.GetType() == typeof(SshClient))
+        {
+            socketWorkflowLogic = 1;
+        }
+        else
+        {
+            if (connection.GetType() == typeof(ShellStream))
+                socketWorkflowLogic = 2;
+        }
+    }
+
+
     public static string sendAT(string ATcommand, int timeout = 0)
     {
         string atKeyWord = ATkeyWords.KeyWords[ATcommand];

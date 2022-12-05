@@ -13,7 +13,7 @@ internal class ATJ
     [Test]
     public static void verifyATJ()
     {
-        Logger.Write("ATJ: start verification of AT command ATJ","ATJ");
+        Logger.Write("ATJ: start verification of AT command ATJ", "Camera.AT: ");
         TestCase.Run("ATJ", "Offset: ");
     }
 

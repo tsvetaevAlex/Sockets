@@ -12,7 +12,7 @@ namespace simicon.automation.Tests.AT;
         [Test]
         public static void verifyATB()
         {
-            Logger.Write("ATB: start verification of AT command ATB", "ATB");
+            Logger.Write("ATB: start verification of AT command ATB", "Camera.ATB: ");
             TestCase.Run("ATB", "night mode","ATB");
         }
 

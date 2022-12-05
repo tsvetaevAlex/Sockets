@@ -9,10 +9,21 @@ namespace simicon.automation.Tests.AT;
     public static class TestCase
     {
 
-        public static void Run(string ATcommand, string ecpectedCOntent, string? TAG = null, int timeToWait = 0)
-        {
-            ShellStream camera= ConnectionPointers.SshCameraStream;
+    public static void Run(string ATcommand, string ecpectedCOntent, string? TAG = null, int timeToWait = 0)
+    {
 
+
+        //RRecretae if null
+        var Picocom = ConnectionPointers.Picocom;
+        if (Picocom == null)
+        {
+            Logger.Write("receive Camera.NPE @ TC.Run. RecCreate Camera ShellStream connection","fixCameraNPE");
+            var cfmSocket = ConnectionPointers.CameraSocket;
+            ShellStream cameraStream = cfmSocket.CreateShellStream("", 0, 0, 0, 0, 0);
+            Picocom = cameraStream;
+        }
+
+        Logger.Write($"Camera=P{Picocom} at received: {ATcommand} ","testCase.Run:");
 
         //public bool GetCaller(object caller, [CallerMemberName] string membername = "")
         //{
@@ -22,21 +33,23 @@ namespace simicon.automation.Tests.AT;
         //}
 
         #region Send AT command
-        camera.WriteLine(ATcommand);
+        Logger.Write("Send at to camera through Camera.DataStream", "CameraWriteline");
         #endregion Send AT command
+        //TODO: Camera is null
+        Picocom.WriteLine(ATcommand);
 
-            #region Receive response
+        #region Receive response
 
-            bool isContentReceived = false;
+        bool isContentReceived = false;
             bool IsOkReceived = false;
 
 
-            while (camera.CanRead)
+            while (Picocom.CanRead)
             {
                 StringBuilder sb = new StringBuilder();
                 string output = "";
                 string buffer = "";
-                buffer = camera.ReadLine();
+                buffer = Picocom.ReadLine();
                 Logger.Write($"Response String received: {buffer}", TAG);
 
             sb.Append(buffer);

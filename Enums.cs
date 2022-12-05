@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace automation
-{
+namespace simicon.automation;
+
     public class Enums
     {
 
@@ -16,4 +16,4 @@ namespace automation
             None
         }
     }
-}
+

@@ -26,6 +26,8 @@
   <ItemGroup>
     <Compile Remove="CommandHelper - Copy.cs" />
     <Compile Remove="Destination.cs" />
+    <Compile Remove="Device.cs" />
+    <Compile Remove="Entities.cs" />
     <Compile Remove="Helper - bwckup 11-7-20222-19 before rollbeck to 10-28Copy.cs" />
     <Compile Remove="TestEnvironment.cs" />
     <Compile Remove="TestSuiteHelper.cs" />

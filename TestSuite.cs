@@ -1,4 +1,3 @@
-using automation;
 
 namespace simicon.automation;
 public static class TestSuite
@@ -6,10 +5,9 @@ public static class TestSuite
     public static string Host = "192.168.10.102";
     public static string Login = "root";
     public static string Passwword = "test";
-    public static string prefix = ">>>>>>>>>>>>>>>>>>>>>>";
 
     [Test, Order(1)]
-    public static void PrepareEvironment()
+    public static void PrepareEnvironment()
     {
         Console.WriteLine("\n<============================[ PrepareEvironment Srarted ]============================");
         ConnectionPointers.InitConnectionPointers("192.168.10.102","root","test");

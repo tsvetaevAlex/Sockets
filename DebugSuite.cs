@@ -4,8 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using automation;
-
 namespace simicon.automation;
 
 public class DebugSuite

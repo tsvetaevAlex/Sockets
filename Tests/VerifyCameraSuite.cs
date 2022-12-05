@@ -7,13 +7,15 @@ public static class VerifyCameraSuite
 [Test, Order(1)]
     public static void PrepareEnvironment()
     {
+        Logger.InitLogfilename();
         Logger.Write(("\n<============================[ PrepareEnvironment Stared ]============================"),
             "PrepareEnvironment");
         ConnectionPointers.InitConnectionPointers("192.168.10.102", "root", "test");
         Sensorapp.Prepare();
+        Logger.InitLogfilename();
     }
 
-[Test, Order(2)]
+    [Test, Order(2)]
     public static void VerifyATG()
     {
     ATG.verifyATG();
