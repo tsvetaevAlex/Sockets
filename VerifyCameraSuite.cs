@@ -101,37 +101,38 @@ public static class VerifyCameraSuite
     }
 
 
-    [Test]
-    public static void at09VerifyATF()
 
-    {
-        Logger.Write("has entered into VerifyATF()", "TraceRoute");
-        Verify("ATF", "Cam flip: ", "ATF");
-    }
 
     [Test]
-    public static void at10VerifyATG()
+    public static void at09VerifyATG()
     {
         Logger.Write("has entered into VerifyATG()", "TraceRoute");
         Verify("ATG", "GAIN: ", "ATG");
     }
     [Test]
-    public static void at11VerifyATG0()
+    public static void at10VerifyATG0()
     {
         Logger.Write("has entered into VerifyATG(0)", "TraceRoute");
         Verify("ATG=0", "GAIN: 0", "ATG");
     }
     [Test]
-    public static void at12VerifyATG6000()
+    public static void at11VerifyATG6000()
     {
         Logger.Write("has entered into VerifyATG(6000)", "TraceRoute");
         Verify("ATG=6000", "GAIN: 480", "ATG");
     }
     [Test]
-    public static void at13VerifyATG()
+    public static void at12VerifyATG()
     {
         Logger.Write("has entered into VerifyATG()", "TraceRoute");
         Verify("ATG", "GAIN: 480", "ATG");
+    }
+    [Test]
+    public static void at13VerifyATF()
+
+    {
+        Logger.Write("has entered into VerifyATF()", "TraceRoute");
+        Verify("ATF", "Cam flip: ", "ATF");
     }
     [Test]
     public static void at14VerifyATJ()
@@ -183,8 +184,10 @@ public static class VerifyCameraSuite
     string Command = input;
     string ExpectedKeyWord = Expected;
 
-    Logger.Write("-------------------- Cut Line ----------------------------------------", TAG);
-    Logger.Write($"Verify 'AT': {Command}, where ExpectedKeyWord is:'{ExpectedKeyWord}'", TAG);
+        Logger.Write("-------------------- Cut Line ----------------------------------------", TAG);
+        Logger.Write($"Verify 'AT': [{Command}]", TAG);
+        Logger.Write($"where Expected response COntent is: [{ExpectedKeyWord}]", TAG);
+        Logger.Write("--------------------", TAG);
 
 
         ShellStream camera = ConnectionPointers.GetCameraStream();
