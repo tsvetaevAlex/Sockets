@@ -10,11 +10,8 @@
 
   <ItemGroup>
     <Compile Remove="ReportFolder\**" />
-    <Compile Remove="Tests\**" />
     <EmbeddedResource Remove="ReportFolder\**" />
-    <EmbeddedResource Remove="Tests\**" />
     <None Remove="ReportFolder\**" />
-    <None Remove="Tests\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,15 +23,16 @@
     <Compile Remove="Entities.cs" />
     <Compile Remove="ExchangeDataBuffer.cs" />
     <Compile Remove="Helper - bwckup 11-7-20222-19 before rollbeck to 10-28Copy.cs" />
-    <Compile Remove="Helper.cs" />
     <Compile Remove="OutputVerification.cs" />
     <Compile Remove="Protoype.cs" />
     <Compile Remove="SocketStream.cs" />
     <Compile Remove="StreamSocket.cs" />
+    <Compile Remove="TestContext.cs" />
     <Compile Remove="TestEnvironment.cs" />
     <Compile Remove="TestSuite.cs" />
     <Compile Remove="TestSuiteHelper.cs" />
     <Compile Remove="VerificationType.cs" />
+    <Compile Remove="VerifyCameraSuite.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -48,6 +46,10 @@
     <PackageReference Include="Renci.SshNet.Async" Version="1.4.0" />
     <PackageReference Include="SSH.NET" Version="2020.0.2" />
     <PackageReference Include="Xamarin.Forms" Version="5.0.0.2515" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Tests\Lences\" />
   </ItemGroup>
 
 </Project>
