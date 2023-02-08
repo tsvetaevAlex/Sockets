@@ -1,16 +1,21 @@
 ﻿
+using Renci.SshNet.Common;
 using System.IO;
-using simicon.automation.Utils;
+using System.Security.Cryptography.X509Certificates;
 
 namespace simicon.automation;
 
 public static class ConnectionPointers
-    {
-    public static SshClient     DeviceSocket;// directly fot device messages
-    public static SftpClient    SftpSocket;
-    public static ShellStream   DeviceStream;// secured ftp to device. to be able download files(snaphots) from device 
-    private static ShellStream  cameraStream;
+{
+    public static string Host = "192.168.10.102";
+    public static string Login = "root";
+    public static string Password = "test";
+    private static SshClient _DeviceSSH;// directly fot device messages
+    private static SftpClient _DeviceSFTP;
+    private static ShellStream _DeviceStream;// secured ftp to device. to be able download files(snaphots) from device 
+    private static ShellStream _cameraStream;
     public static string TAG = "ConnectionPointers";
+    public static string sTAG = "stability";
 
     /// <summary>
     /// initializa all reuqired connections: SSH  and SFTP to device, console to Camera
@@ -19,17 +24,69 @@ public static class ConnectionPointers
     /// <param name="loginname"></param>
     /// <param name="pswd"></param>
 
-    public static ShellStream GetCameraStream()
+    public static SshClient GetDeviceSSH()
     {
-        Logger.Write($"we are in ConnectionPointers.GetCameraStream outbound stream is :'{cameraStream}'.",TAG);
-
-        if (cameraStream != null)
-            Logger.Write($"We are in ConnectionPointers.GetCameraStream, if says tha cameraStrem not null, cameraStream ='{cameraStream}'", TAG);
-
+        return _DeviceSSH;
+    }
+    public static SftpClient GEtDeviceSFTP()
+    {
+        return _DeviceSFTP;
+    }
+    public static ShellStream GetDeviceShell()
+    {   
+        return _DeviceStream;
+    }       
+    public static ShellStream? GetCameraStream()
+    {
+        try
+        {
+            if (_cameraStream.CanRead)
+            {
+                Logger.Write("GetCameraStream.if (_cameraStream.CanRead) TRUE (inside if)", TAG);
+            }
+            else
+            {
+                Logger.Write("GetCameraStream.if (_cameraStream.CanRead) FALSE (inside if)", sTAG);
+                Logger.Write("attempt to create a nw pcamera connection(picocom)", sTAG);
+            Logger.Write($"we are in ConnectionPointers.GetCameraStream outbound stream is :'{_cameraStream}'.", TAG);
+            Logger.Write("attempt to create a nw pcamera connection(picocom)", sTAG);
+                ShellStream pic1 = AuthorizePicocom();
+                if (pic1 != null)
+                {
+                    Logger.Write($"New not null connection created: {pic1}", sTAG);
+                    if (pic1.CanRead)
+                    {
+                        Logger.Write("New nol null and .CanRead", sTAG);
+                        return pic1;
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            _cameraStream.Dispose();
+        }
+        if ((_cameraStream != null) && (_cameraStream.CanRead))
+        {
+            Logger.Write($"We are in ConnectionPointers.GetCameraStream, if says tha cameraStrem is not null anda cameraStream readable; camera stream  ='[{_cameraStream}]'", TAG);
+            return _cameraStream;
+        }
         else
-            Assert.Fail("No connection to Camera");
+        {
+            string errMessage = "We are in ConnectionPointers.GetCameraStream, No connectionObject to Camera it null and/or not CanRead.";
+            Logger.Write(errMessage, sTAG);
+            Logger.Write("Attempt to picocom agagin...", sTAG);
+            ShellStream? pic2 = AuthorizePicocom();
+            Assert.Fail("No connectionObject to Camera");
+            //_cameraStream.Dispose;
+            if ((pic2 != null) && (pic2.CanRead))
+            {
+                return pic2;
+            }
 
-        return cameraStream;
+        }
+
+        return _cameraStream;
     }
 
     private static void SetCameraStream (ShellStream stream)
@@ -37,193 +94,77 @@ public static class ConnectionPointers
         Logger.Write($"we are in SetCameraStream inbound stream is :'{stream}'.",TAG);
         if (stream is null)
         {
-            Logger.Write($"EPIC FAIL ET FILED we are in SetCameraStream inbound stream is null WTF", TAG);
-
+           
         }
-        cameraStream = stream;
+        _cameraStream = stream;
     }
 
     public static void InitConnectionPointers(string host, string loginname, string pswd)
     {
-        Logger.Write("\"\\n<---------[ IniSSHConnection-Connection ]--------->", TAG);
-        IniSSHConnection(host, loginname, pswd);
-        Logger.Write("\"\\n<---------[ InitSftpConnection-Connection ]--------->", TAG);
-        InitSftpConnection(host, loginname, pswd);
-        Logger.Write("\"\\n<---------[ AuthorizePicocom-Connection ]--------->", TAG);
-        AuthorizePicocom();
-        summarize();
+
+
         Logger.Write("has entered into InitConnectionPointers", "TraceRoute");
 
-//IniSSHConnection
+
+        Logger.Write("has entered into PrepareEnvironment -> ConnectionPointers.InitConnectionPointers", TAG);
+        Host = host;
+            Globals.Host = host;
+            Login = loginname;
+            Globals.Login = loginname;
+            Password = pswd;
+            Globals.Password = Password;
+
+
         try
         {
                 IniSSHConnection(host, loginname, pswd);
-                string sshResultMessage = $"result of attempt to create SSH connection is: DeviceSocket == {DeviceSocket}";
+                string sshResultMessage = $"result of attempt to create SSH connectionObject is: _DeviceSSH == {_DeviceSSH}";
                 Logger.Write(sshResultMessage, TAG);
         }
         catch (Exception e)
         {
-            string ExMessage = $"in rime of creation  SSH client connection Exception has been thrown:{e.Message}";
+            string ExMessage = $"in rime of creation  SSH client connectionObject Exception has been thrown:{e.Message}";
             Console.WriteLine(ExMessage);
             Logger.Write(ExMessage,TAG);
         }
 
-//InitSftpConnection
-        try
+        if (!_DeviceSSH.IsConnected)
         {
-            Console.WriteLine("\n<---------[ InitSFTPnnection-Connection ]--------->");
-            Logger.Write("\n<---------[ InitSFTPConnection ]--------->", TAG);
-            InitSftpConnection(host, loginname, pswd);
-            Logger.Write($"sftp Connection: {SftpSocket}, created", TAG);
-            string sshMessage = $"result of attempt to create SFTP connection is: DeviceSocket == {SftpSocket}";
-            Snapshot.Get(".Default.jpg", "PrepareEnvironment");
+            Logger.Write($"SSH connectionObject to Device({host}) is not established", TAG);
         }
-        catch (Exception e)
-        {
-            Logger.Write($"in InitSftpConnection exception was thrown: {e.ToString}",TAG);
-        }
+        Logger.Write($"SSh connectionObject to device is {_DeviceSSH}.", TAG);
+////////////////////////////////////////////////<---------[ InitSFTPnnection-Connection ]--------->");
+        Console.WriteLine("\n<---------[ InitSFTPnnection-Connection ]--------->");
+        Logger.Write("\n<---------[ InitSFTPConnection ]--------->",TAG);
+        InitSftpConnection(host, loginname, pswd);
+        string sshMessage = $"result of attempt to create SFTP connectionObject is: _DeviceSSH == {_DeviceSFTP}";
+        Logger.Write($"actualSftp Connection: {_DeviceSFTP}, created", TAG);
 
-        if (!DeviceSocket.IsConnected)
-        {
-            Logger.Write($"SSH connection to Device({host}) is not established", TAG);
-        }
-        Logger.Write($"SSh connection to device is {DeviceSocket}.", TAG);
+////////////////////////////////////////////////<---------[ Init Picocom->Device.Camera ]--------->");
+        Console.WriteLine("\n<---------[ Init Picocom->Device.Camera ]--------->");
+        Logger.Write("\n<---------[ Init Picocom->Device.Camera Connection ]--------->",TAG);
+        AuthorizePicocom();
+        Logger.Write($"Picocom connectionObject to device is: [{_cameraStream}]", TAG);
 
-// get Default snapshot
-        try
-        {
-            Logger.Write("\n<---------[ Get DEfalt AnapAHot ]--------->", TAG);
-            Snapshot.Get(".Default.jpg", "PrepareEnvironment");
-        }
-        catch (Exception e)
-        {
-            Logger.Write($" In Get Default SnapShot exception was thrown: {e.ToString}", TAG);
-        }
-
-        Logger.Write("\n<---------[ Init Picocom->Device.Camera ]--------->", TAG);
-        //picocom
-        try
-        {
-            AuthorizePicocom();
-            Logger.Write($"Picocom connection to device is: [{cameraStream}]", TAG);
-        }
-        catch (Exception e)
-        {
-            Logger.Write($" In AuthorizePicocomsssss exception was thrown: {e.ToString}", TAG);
-        }
     }
     /// <summary>
-    /// create connection ro camera console using picocom Command
+    /// create connectionObject to camera console using picocom command
     /// </summary>
-
-    /// <summary>
-    /// create SSH connection to Device
-    /// </summary>
-    /// dvice credentials as  poarams
-    /// <param name="ip"></param>
-    /// <param name="loginname"></param>
-    /// <param name="pswd"></param>
-    private static void IniSSHConnection(string ip, string loginname, string pswd)
-        {
-
-        Logger.Write("has entered into IniSSHConnection", "TraceRoute");
-        #region create SSH connection with device
-        Logger.Write("Attempt to create SSH Bridge to Device (Device Console)", TAG);
-            try
-            {
-            SshClient DeviceSocket = new SshClient(ip, loginname, pswd);
-            Logger.Write($"SSH Device Connection created. Pointer  is: {DeviceSocket}.", TAG);
-            DeviceSocket.Connect();
-            if (DeviceSocket.IsConnected)
-            {
-                Logger.Write("IniSSHConnection", TAG);
-                Logger.Write($"used credentials: {ip}, {loginname}, {pswd}", TAG);
-                Logger.Write($"SSH pointer: '{DeviceSocket}'", TAG);
-                Logger.Write($"Is SSH pointer connected: '{DeviceSocket.IsConnected}'", TAG);
-                ShellStream stream = DeviceSocket.CreateShellStream("", 0, 0, 0, 0, 0);
-                DeviceStream = stream;
-            }
-            //DeviceSocket = _client;
-            //DevicebackDoor = _client;
-        }
-
-            catch (SocketException e)
-            {
-                string ExSSHmessage = $"Exception in time of creation SSHClient:Exception: {e.ToString}";
-
-                Console.WriteLine(ExSSHmessage);
-                Logger.Write(ExSSHmessage, TAG);
-                Assert.Fail(ExSSHmessage);
-            }
-
-            #region wait for connection acknowledgment
-
-            string authorizationApproval = "Processing /etc/profile... Done";
-            if (DeviceStream.DataAvailable)
-            {
-                while (DeviceStream.CanRead)
-                {
-                    string acknowledgment = DeviceStream.ReadLine();
-
-                    if (acknowledgment.Contains(authorizationApproval))
-                    {
-                        Logger.Write("initConnectionPointers, response received: 'Processing /etc/profile... Done'",
-                            TAG);
-                        Console.Write($"resp: '{acknowledgment}'");
-                        Logger.Write($"!!!SSH CONNECTION APPROVED!!!", TAG);
-                    }
-                }
-            }
-
-            #endregion
-        #endregion
-        }// End of initConnection
-
-/// <summary>
-///  crete SFTP connection to Device
-/// </summary>
-/// dvice credentials as  poarams
-/// <param name="ip"></param>
-/// <param name="lohinname"></param>
-/// <param name="pswd"></param>
-    private static void InitSftpConnection(string ip, string lohinname, string pswd)
-    {
-        #region create SFTP connection with Device
-
-        Logger.Write("has entered into InitSFTPConnection", "TraceRoute");
-
-        Logger.Write("Device InitSftpConnection", TAG);
-        try
-        {
-            SftpClient sftp = new SftpClient(ip, lohinname, pswd);
-            sftp.Connect();
-            Logger.Write($"sftp connection:'{sftp}'", TAG);
-            SftpSocket = sftp;
-        }
-        catch (Exception e)
-        {
-            string sftpExMessage =$"In time of creation SFTP connection Exception has been thrown:{e.Message}";
-            Console.WriteLine(sftpExMessage);
-            Logger.Write(sftpExMessage, TAG);
-            Assert.Fail(sftpExMessage);
-        }
-
-        #endregion
-    }
-    private static void AuthorizePicocom()
+    private static ShellStream? AuthorizePicocom()
     {
         Logger.Write("has entered into AuthorizePicocom", "TraceRoute");
 
-        ShellStream cameraStream = DeviceSocket.CreateShellStream("picocom Terminal", 80, 180, 800, 600, 1024);
+        ShellStream cameraStream = _DeviceSSH.CreateShellStream("picocom Terminal", 80, 180, 800, 600, 1024);
 
         string picocomRequest = "picocom -b 115200 /dev/tts/camera --imap lfcrlf";
         string expectedContent = "Terminal ready";
 
         StringBuilder sb = new StringBuilder();
+        string output = "";
         string buffer = "";
-        Logger.Write($"send Camera connection string to create camera data channel: '{picocomRequest}'.", TAG);
+        Logger.Write($"send Camera connectionObject string to create camera data channel: '{picocomRequest}'.", TAG);
         //send auth request
-        cameraStream.Flush();
+        //cameraStream.Flush();
         cameraStream.WriteLine(picocomRequest);
         Thread.Sleep(1000); // Prevents the shell from losing the output if it becomes too slow
 
@@ -242,33 +183,114 @@ public static class ConnectionPointers
                 sb.Append(buffer);
                 if (buffer.Contains(expectedContent))
                 {
-
                     Logger.Write("!!!Camera Console Connected: 'Terminal Ready' message received.",
                         TAG);
                     cameraStream = stream;
+                    Globals.Picocom = stream;
                     Logger.Write($"!!!\\n1st variable 'stream':{stream}"
-                                 + $"2nd variable 'cameraStream': {cameraStream}",
+                                 + $"2nd variable 'cameraStream= _DeviceSSH.CreateShellStream()': {cameraStream}",
                         TAG);
-                }                    
-                if (buffer.Contains("FATAL: cannot lock "))
-                    {
-                        string fatalMessage = "continue is not available\r\nConnectionFAIL.FATAL Error Message received, that Resource temporarily unavailable.";
-                        Logger.Write(fatalMessage, ".Failure");
-                        Environment.Exit(503);
-                    }
+                    Globals.isEnvironmentPrepared= true;
+                    return stream;
+                }
             }// end of while (stream.DataAvailable)
         }// end of if (stream.DataAvailable)
+        return stream;
     }//end of AuthorizePicocom
 
-     /// <summary>
-    /// print out connection pointers created during Environment prepartion in ConnectionPoiners class
+    /// <summary>
+    /// create SSH connectionObject to Device
     /// </summary>
-    public static void summarize()
+    /// dvice credentials as  poarams
+    /// <param name="ip"></param>
+    /// <param name="loginname"></param>
+    /// <param name="pswd"></param>
+    private static void IniSSHConnection(string ip, string loginname, string pswd)
+        {
+
+        Logger.Write("has entered into IniSSHConnection", "TraceRoute");
+
+        #region create SSH connection with device
+        Logger.Write("Attempt to create SSH Bridge to Device (Device Console)", TAG);
+            try
+            {
+            SshClient _client = new SshClient(ip, loginname, pswd);
+            Logger.Write($"SSH Device Connection created. Pointer  is: {_client}.", TAG);
+            _client.Connect();
+                _DeviceSSH = _client;
+            }
+            catch (SocketException e)
+            {
+                string ExSSHmessage = $"Exception in time of creation SSHClient:Exception: {e.Message}";
+
+                Console.WriteLine(ExSSHmessage);
+                Logger.Write(ExSSHmessage, TAG);
+                Assert.Fail(ExSSHmessage);
+            }
+
+            ShellStream stream = _DeviceSSH.CreateShellStream("", 0, 0, 0, 0, 0);
+            _DeviceStream = stream;
+        
+            #region wait for connection acknowledgment
+
+            string authorizationApproval = "Processing /etc/profile... Done";
+            if (stream.DataAvailable)
+            {
+                while (stream.CanRead)
+                {
+                    string acknowledgment = stream.ReadLine();
+
+                    if (acknowledgment.Contains(authorizationApproval))
+                    {
+                        Logger.Write("initConnectionPointers, response received: 'Processing /etc/profile... Done'",
+                            TAG);
+                        Console.Write($"resp: '{acknowledgment}'");
+                        Logger.Write($"!!!SSH CONNECTION APPROVED!!!", TAG);
+                    }
+                }
+            }
+
+            #endregion
+        #endregion
+        }// End of initConnection
+
+/// <summary>
+///  crete SFTP connectionObject to Device
+/// </summary>
+/// dvice credentials as  poarams
+/// <param name="ip"></param>
+/// <param name="lohinname"></param>
+/// <param name="pswd"></param>
+    private static void InitSftpConnection(string ip, string lohinname, string pswd)
     {
-        Logger.Write("------------------------- summarize of InitConnectionPointers -------------------------", TAG );
-        Logger.Write($"DeviceSocket: {DeviceSocket}", TAG);
-        Logger.Write($"SftpSocket: {SftpSocket}", TAG);
-        Logger.Write($"DeviceStream: {DeviceStream}", TAG);
-        Logger.Write($"cameraStream: {cameraStream}", TAG);
+        #region create SFTP connection with Device
+
+        Logger.Write("has entered into InitSFTPConnection", "TraceRoute");
+
+        Logger.Write("Device InitSftpConnection", TAG);
+        try
+        {
+            _DeviceSFTP = new SftpClient(ip, lohinname, pswd);
+            _DeviceSFTP.Connect();
+            Globals.DeviceSFTP = _DeviceSFTP;
+        }
+        catch (Exception e)
+        {
+            string sftpExMessage =$"In time of creation SFTP connectionObject Exception has been thrown:{e.ToString}";
+            Console.WriteLine(sftpExMessage);
+            Logger.Write(sftpExMessage, TAG);
+            Assert.Fail(sftpExMessage);
+        }
+
+        #endregion
+    }
+    public static void Dispose()
+    {
+        Logger.Write("we are in ConnectionPointers.Dispose()", "TraceRoute");
+
+        _DeviceSSH.Dispose();
+        _DeviceSFTP.Dispose();
+        _DeviceStream.Dispose();
+        _DeviceStream.Dispose();
     }
 }// end o class ConnectionPointers

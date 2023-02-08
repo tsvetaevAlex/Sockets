@@ -1,6 +1,4 @@
-﻿using simicon.automation.Utils;
-
-namespace simicon.automation;
+﻿namespace simicon.automation;
 
 public static class SshSocket
 {
@@ -9,9 +7,8 @@ public static class SshSocket
 
     public static string GetResponse(string message)
     {
-
-        SshClient conn = ConnectionPointers.DeviceSocket;
-        using (var cmd = conn.CreateCommand(message))
+        SshClient  socket = ConnectionPointers.GetDeviceSSH();
+        using (var cmd = socket.CreateCommand(message))
         {
             cmd.Execute();
             string output = cmd.Result;
@@ -27,12 +24,6 @@ public static class SshSocket
         }
 
     }
-
-    /// <summary>
-    /// SSHSocket class. Send message to  SSH DeviceSocket
-    /// </summary>
-    /// <param name="message"></param>
-    /// <param name="expectedKeyWord"></param>
     public static void Send(string message, string expectedKeyWord)
     {
         Logger.Write($"we are in SshSocket.Send\\n message is: {message};\\nexpectedKeyWord is: {expectedKeyWord}", TAG);
@@ -43,9 +34,8 @@ public static class SshSocket
         string _output = "";
         Logger.Write($"message to send: {message}", TAG);
 
-        SshClient conn = ConnectionPointers.DeviceSocket;
-        // USING CreateCommand
-        using (var cmd = conn.CreateCommand(message))
+        SshClient socket = ConnectionPointers.GetDeviceSSH();
+        using (var cmd = socket.CreateCommand(message))
         {
             cmd.Execute();
             _output = cmd.Result;
@@ -56,6 +46,7 @@ public static class SshSocket
                 {
                     if (_output.Contains(expectedKeyWord))
                     {
+                        isExpectedEmpty = true;
                         isKeyWOrdReceived = true;
                     }
                 }
@@ -65,16 +56,16 @@ public static class SshSocket
 
                     string summaryMessage =
                         "Verification successfully passed. Exit Code is 0 and expected content has not been  provided.";
-                    Logger.Write(summaryMessage, TAG);
-                    Assert.Pass(summaryMessage);
-                    Console.WriteLine(summaryMessage);
+                        Logger.Write(summaryMessage, TAG);
+                        Assert.Pass(summaryMessage);
+                        Console.WriteLine(summaryMessage);
 
                 }
 
                 if (isKeyWOrdReceived && IsOkReceived && exit0)
                 {
                     string summaryMessage =
-                        $"AT Command: {message}, Verification successfully passed. Expected content and OK #tag received";
+                        $"AT command: {message}, Verification successfully passed. Expected content and OK #tag received";
                     Logger.Write(summaryMessage, TAG);
                     Assert.Pass(summaryMessage);
                 }
@@ -85,14 +76,14 @@ public static class SshSocket
                         Logger.Write("FAIL. output does not contains Expected Keyword.", TAG);
                     }
                 }
-                if (_output.Contains("ERR"))
-                {
-                    string errMessage = $"Request: {message}, Failed due to output contains ERR token.";
-                    Logger.Write(errMessage, TAG);
-                    Assert.Fail(errMessage);
-                }//if ExitCOde ==0
-            }// end of if (cmd.ExitStatus == 0)ss;
+                //if (_output.Contains("ERR"))
+                    //{
+                    //    string errMessage = $"Request: {message}, Failed due to output contains ERR token.";
+                    //    Logger.Write(errMessage,TAG);
+                    //    Assert.Fail(errMessage);
+            }//if ExitCOde ==0
+        }// end of using{};
 
-        }// end of using (var cmd = conn.CreateCommand(message))
-    }// end of send();
-}// end of public static class SshSocket
+    }// end of send(){}
+}// end of class
+

@@ -1,14 +1,12 @@
-﻿using simicon.automation.Tests;
-using System.Security.Cryptography.X509Certificates;
-using Xamarin.Forms;
-
-namespace simicon.automation;
+﻿namespace simicon.automation;
 
 public static class Helper
 {
     //private StringBuilder entireResponse = new StringBuilder();
 
+    private static string TAG = "automation.Helper";
     private static string FullResponse = "";
+
 
     public static string Send(string message, string ExpectedKeyWord, string TAG, bool returnResponse = false)
     {
@@ -36,7 +34,7 @@ public static class Helper
 
                         Logger.Write($"response line: {buffer}", TAG);
                         entireResponse.Append(buffer);
-                        if (buffer.Contains(ExpectedKeyWord))
+                        if (buffer.Contains(ExpectedKeyWord)) 
                         {
                             break;
                         }
@@ -45,14 +43,14 @@ public static class Helper
                 }
                 else
                 {
-                    Logger.Write("receive Response ended due to stream dataAvailalbe is false.", "Helper");
+                    Logger.Write("receive Response ended due to stream dataAvailalbe is false.","Helper");
                     break;
                 }
             }
 
             catch (Exception e)
             {
-                Logger.Write($"Send Command issue has been happend: {e.Message}", TAG);
+                Logger.Write($"Send command issue has been happend: {e.Message}", TAG);
                 return output;
 
             }
@@ -66,8 +64,12 @@ public static class Helper
 
     public static void ClarifySensorType()
     {
-        string fullOutput = Send("AT2", "", "ClarifySensorType", true);
-
+        Verify(
+            input: "AT2",
+            ExpectedKeyWord: "",
+            _TAG: "ClarifySensorType",
+            returnResponse: true
+            );
         if (FullResponse.Contains("Night mode is for color sensors only!"))
         {
             Globals.CameraType = SensorType.BW;
@@ -78,30 +80,19 @@ public static class Helper
         }
     }
 
-    public static void Verify(string ATcommand, string expectedContent, string _tag)
+    public static void Verify(string input, string ExpectedKeyWord, string _TAG, bool returnResponse = false)
     {
-        Verify(new RequestDetails(
-            inputCommand: ATcommand,
-            expectedTextContent: expectedContent,
-            TAG: _tag
-        ));
-    }
-    public static string Verify(RequestDetails request)
-    {
-        AutomationPrepareEnvironment.VerifyTestEnvironment();
         Logger.Write("has entered into Verify()", "TraceRoute");
 
-        
-        string TAG = request.tag;
-        string Command = request.Command;
-        string expectedTextContent = request.ExpectedContent;
+        TAG = _TAG;
+        string Command = input;
 
         string fullOutput = String.Empty;
-        fullOutput= Send(Command, expectedTextContent, TAG,true);
+        fullOutput= Send(Command, ExpectedKeyWord, _TAG,true);
         
         Logger.Write("-------------------- Cut Line ----------------------------------------", TAG);
         Logger.Write($"Verify 'AT': [{Command}]", TAG);
-        Logger.Write($"where Expected response COntent is: [{expectedTextContent}]", TAG);
+        Logger.Write($"where Expected response COntent is: [{ExpectedKeyWord}]", TAG);
         Logger.Write("--------------------", TAG);
 
 
@@ -114,15 +105,16 @@ public static class Helper
         #region Send AT to picocom
         bool isContentReceived = false;
         bool isOkReceived = false;
-        StringBuilder entireResponse = new StringBuilder();
         //ShellStream camera = ConnectionPointers;
         try
         {
 
             string buffer = "";
             bool isKeyWordReceived = false;
-            Logger.Write($"connectionObject VerifyCameraSuite. camera stream pointer:  '{camera}'", TAG);
+            StringBuilder entireResponse = new StringBuilder();
+            Logger.Write($"connection VerifyCameraSuite. camera stream pointer:  '{camera}'", TAG);
 //WHILE
+
             while (true)
             {
                 try
@@ -132,46 +124,45 @@ public static class Helper
                         buffer = camera.Read();
                         if (buffer != "")
                         {
-                            Logger.Write($"\r\nresponse line: {buffer}", TAG);
+                            Logger.Write($"response line: {buffer}", TAG);
                             entireResponse.Append(buffer);
 //VERIFICATION
                             #region instant verification
 
-                            if (fullOutput.Contains(expectedTextContent))
+                            if (fullOutput.Contains(ExpectedKeyWord))
                             {
-
-                                Logger.Write($"excepted text content {buffer}", TAG);
-                                Logger.Write("Expected text content receeived; test Step:Passed", TAG);
+                                Logger.Write($"is excepted content received: {buffer.Contains(ExpectedKeyWord)}", TAG);
                                 isKeyWordReceived = true;
                             }
                             if (buffer.Contains("OK"))
                             {
                                 isOkReceived = true;
-                                Logger.Write($"'OK' token received: {buffer}; test Step:Passed", TAG);
+                                Logger.Write($"'OK' token received: {buffer}", TAG);
+                                Logger.Write($"is OK tag received: {buffer.Contains("OK")}", TAG);
                                 break;
                             }
-                            if (buffer.Contains("ERR ("))
+
+                            if (fullOutput.Contains("ERR"))
                             {
                                 string message =
-                                    $"TEstCase: AT Command: {Command} Test execution FAIL," +
+                                    $"TEstCase: AT command: {Command} execution FAIL," +
                                     $"due to ERR token has been received: '{buffer}'";
                                 Logger.Write(message, TAG);
                                 Assert.Fail(message);
-                                break;
                             }
 //CONCLUSION
                             #region conclusion
-                            Logger.Write($"Conclusionbased on Flags:\r\n isKeyWordReceived= {isKeyWordReceived}'\r\nisOkReceived={isOkReceived}", TAG);
+                            Logger.Write($"Conclusionbased on Flags:\\r\\n isKeyWordReceived= {isKeyWordReceived}' and isOkReceived={isOkReceived}", TAG);
                             if (isContentReceived && isOkReceived)
                             {
                                 string conclusionMessage =
-                                    $"AT Command: {Command}, Verification successfully passed. Expected content and OK #tag received";
+                                    $"AT command: {Command}, Verification successfully passed. Expected content and OK #tag received";
                                 Logger.Write(conclusionMessage, TAG);
                                 Assert.Pass(conclusionMessage);
                             }
                             #endregion
 
-                        }// if buffer != ""
+                        }
                         #endregion
 
                     }
@@ -189,17 +180,7 @@ public static class Helper
             Thread.Sleep(500);
 
             #endregion
-//CONCLUSION
-            #region conclusion
-            Logger.Write($"Conclusionbased on Flags:\\r\\n isKeyWordReceived= {isKeyWordReceived}' and isOkReceived={isOkReceived}", TAG);
-            if (isContentReceived && isOkReceived)
-            {
-                string conclusionMessage =
-                    $"AT Command: {Command}, Verification successfully passed. Expected content and OK #tag received";
-                Logger.Write(conclusionMessage, TAG);
-                Assert.Pass(conclusionMessage);
-            }
-            #endregion
+
 
         }
         catch (Exception e)
@@ -208,7 +189,52 @@ public static class Helper
             Logger.Write($"Exception message:  {e.Message}", TAG);
 
         }
-        return entireResponse.ToString();
-    }// end of verify
+    }// en of verify
 
 }
+/*
+ instatnt verification backup
+       buffer = camera.Read();
+                        if (buffer != "")
+                        {
+                            Logger.Write($"response line: {buffer}", TAG);
+                            entireResponse.Append(buffer);
+                            #region instatnt verification
+
+                            if (buffer.Contains(ExpectedKeyWord))
+                            {
+                                Logger.Write($"is excepted content received: {buffer.Contains(ExpectedKeyWord)}", TAG);
+                                isKeyWordReceived = true;
+                            }
+                            if (buffer.Contains("OK"))
+                            {
+                                isOkReceived = true;
+                                Logger.Write($"'OK' token received: {buffer}", TAG);
+                                Logger.Write($"is OK tag received: {buffer.Contains("OK")}", TAG);
+                                break;
+                            }
+
+                            if (buffer.Contains("ERR"))
+                            {
+                                string message =
+                                    $"TEstCase: AT command: {Command} execution FAIL," +
+                                    $"due to ERR token has been received: '{buffer}'";
+                                Logger.Write(message, TAG);
+                                Assert.Fail(message);
+                            }
+
+                            #region conclusion
+                            Logger.Write($"Conclusionbased on Flags:\\r\\n isKeyWordReceived= {isKeyWordReceived}' and isOkReceived={isOkReceived}", TAG);
+                            if (isContentReceived && isOkReceived)
+                            {
+                                string conclusionMessage =
+                                    $"AT command: {Command}, Verification successfully passed. Expected content and OK #tag received";
+                                Logger.Write(conclusionMessage, TAG);
+                                Assert.Pass(conclusionMessage);
+                            }
+                            #endregion
+
+                        }
+                        #endregion
+ 
+ */

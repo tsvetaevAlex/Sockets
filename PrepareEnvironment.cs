@@ -41,7 +41,7 @@ public static class PrepareEnvironment
             {
                 Logger.Write($"Exception throen at SensorappRestart; {ex.Message}", "sensorapp");
             }
-            ConnectionPointers.InitConnectionPointers("192.168.10.102","root","test");
+
             Logger.Write("Update Environment ready status", "sensorapp");
             Logger.Write("Update Environment ready status", "TraceRoute");
             Globals.isEnvironmentPrepared = true;
@@ -49,7 +49,6 @@ public static class PrepareEnvironment
         else
         {
             Logger.Write("Environment is in valid state/prepared", "PrepareEnvironment");
-            ConnectionPointers.summarize();
         }
     }
 }

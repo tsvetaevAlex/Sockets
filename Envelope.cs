@@ -1,4 +1,8 @@
 ﻿
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using NUnit.Framework.Internal;
+using Renci.SshNet;
+
 namespace simicon.automation;
 
     public class Envelope

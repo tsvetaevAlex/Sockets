@@ -1,9 +1,18 @@
-﻿using simicon.automation.Utils;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
+using System.Threading.Tasks;
+using static simicon.automation.Utils.Enums;
+using Xamarin.Forms;
 
 namespace simicon.automation;
 
 public static class Sensorapp
 {
+
+
     public static void UpdateSensorappProperty()
     {
 
@@ -16,6 +25,7 @@ public static class Sensorapp
 
 
         string SensorappSelectExpectedContent = "";
+        SshSocket.Send(SensorappUdateRequest, "");
         SshSocket.Send(SensorappUdateRequest, SensorappSelectExpectedContent);
     }
 
@@ -23,19 +33,20 @@ public static class Sensorapp
     {
     Logger.Write("has entered into VerifySensorappProperty", "TraceRoute");
     Logger.Write("has entered into VerifySensorappProperty", "sensorapp");
+    bool isExpcted = false;
+    bool isExit0 = false;
         #region Verify value of updated Sensorapp Property
         string SensorappSelectRequest = "sqlite3 /tftpboot/boot/conf/kris.sql3 \"select * from tblSettings\" | grep SENSORAPP_MSENSORATPORT";
     string expectedContent = "SENSORAPP_MSENSORATPORT|";
-        #endregion
-
-        SshSocket.Send(SensorappSelectRequest, expectedContent);
+    SshSocket.Send(SensorappSelectRequest, expectedContent);
     }
+    #endregion
 
     public static void SensorappRestart()
     {
 
     Logger.Write("has entered into SensorappRestart", "TraceRoute");
-    Logger.Write("has entered into SensorappRestart", "sensorapp");
+    Logger.Write("has entered into SensorappRestert", "sensorapp");
 
     #region Srvice Restart
     string RestartQuery = "sv restart /service/sensorapp0";
@@ -49,5 +60,5 @@ public static class Sensorapp
     }
 
 
-}// end of class Sensorapp
+        }// end of class Sensorapp
 

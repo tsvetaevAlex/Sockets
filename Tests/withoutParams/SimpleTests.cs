@@ -20,19 +20,20 @@ public static class SimpleTests
     public static void ats01VerifyATC()
     {
         Logger.Write("has entered into VerifyATC()", "TraceRoute");
-        Logger.Write("ATC", "ApCorr: ", "ATC");
+        Logger.Write("Command:ATC; expexted Text COntent:ApCorr; ", "ATC");
         Helper.Verify(new RequestDetails(
             inputCommand: "ATC",
             expectedTextContent: "ApCorr: ",
             TAG: "ATC"
         ));
     }
+
     [Test]
     public static void ats02VerifyATF()
 
     {
         Logger.Write("has entered into VerifyATF()", "TraceRoute");
-        Logger.Write("ATF", "Cam flip: ", "ATF");
+        Logger.Write("Command: ATF; Expected Text Content: Cam flip; ", "ATF");
         Helper.Verify(new RequestDetails(
             inputCommand: "ATF",
             expectedTextContent: "Cam flip: ",
@@ -43,7 +44,7 @@ public static class SimpleTests
     public static void Ats03VerifyATG()
     {
         Logger.Write("has entered into VerifyATG()", "TraceRoute");
-        Logger.Write("ATG", "GAIN: 480", "ATG");
+        Logger.Write("Command: ATG; Expected Text Content: GAIN: 480", "ATG");
         Helper.Verify(new RequestDetails(
             inputCommand: "ATG",
             expectedTextContent: "GAIN: ",
@@ -56,7 +57,7 @@ public static class SimpleTests
 
     {
         Logger.Write("has entered into VerifyATJ()", "TraceRoute");
-        Logger.Write("ATJ", "Offset: ", "ATJ");
+        Logger.Write("Commans: ATJ; Expected Text Content: Offset: ", "ATJ");
         Helper.Verify(new RequestDetails(
             inputCommand: "ATJ",
             expectedTextContent: "Offset: ",
@@ -70,7 +71,7 @@ public static class SimpleTests
 
     {
         Logger.Write("has entered into VerifyATK)", "TraceRoute");
-        Logger.Write("ATK", "Hpoint: ", "ATK");
+        Logger.Write("Commnd: ATK; Expected Text Content: Hpoint; ", "ATK");
         Helper.Verify(new RequestDetails(
             inputCommand: "ATk",
             expectedTextContent: "Hpoint: ",
@@ -82,7 +83,7 @@ public static class SimpleTests
     public static void ats06VerifyATL()
     {
         Logger.Write("has entered into VerifyATL()", "TraceRoute");
-        Logger.Write("ATL", "Max exp: ", "ATL");
+        Logger.Write("Commnd: ATL; Expected Text Content: Max exp: ", "ATL");
         Helper.Verify(new RequestDetails(
             inputCommand: "ATL",
             expectedTextContent: "Max exp: ",
@@ -94,7 +95,7 @@ public static class SimpleTests
     public static void ats07VerifyATP()
     {
         Logger.Write("has entered into VerifyATP()", "TraceRoute");
-        Logger.Write("ATP", "Cur exp: ", "ATP");
+        Logger.Write("Commnd: ATP; Expected Text Content: Cur exp: ", "ATP");
         Helper.Verify(new RequestDetails(
             inputCommand: "ATL",
             expectedTextContent: "Cur exp: ",

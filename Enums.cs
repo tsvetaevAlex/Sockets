@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace simicon.automation;
+﻿namespace simicon.automation.Gen2;
 
 public static class Enums
 {
@@ -15,6 +9,12 @@ public static class Enums
         Contains,
         None,
         NoResp
+    }
+    public enum SensorType
+    {
+        Color,
+        BW,
+        Undefined
     }
 
 }

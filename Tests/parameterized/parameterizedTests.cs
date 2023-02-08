@@ -9,7 +9,6 @@ namespace simicon.automation.Tests.parameterized;
 
 public static class parameterizedTests
 {
-
     [Test]
     public static void Atp01VerifyATG()
     {
@@ -25,7 +24,7 @@ public static class parameterizedTests
     [Test]
     public static void Atp02VerifyATG6000()
     {
-        Logger.Write("TEstCase: Atp02VerifyATG6000", "TraceRoute");
+        Logger.Write("TestCase: Atp02VerifyATG6000", "TraceRoute");
         Snapshot.Get("Before_ATG6000On.jpg", "ATG");
         Logger.Write("has entered into VerifyATG(6000)", "TraceRoute");
         Helper.Verify("ATG=6000", "GAIN: 480", "ATG");
@@ -58,6 +57,7 @@ public static class parameterizedTests
     {
         Logger.Write("TEstCase: atp07VerifyATF2", "TraceRoute");
         
+        Snapshot.Get("Before_ATF2.jpg", "ATF");
         Helper.Verify(new RequestDetails(
             inputCommand: "ATF=2",
             expectedTextContent: "Cam flip: Vert",
@@ -69,7 +69,7 @@ public static class parameterizedTests
     public static void atp07VerifyATF3()
     {
         Logger.Write("TEstCase: atp07VerifyATF3", "TraceRoute");
-        //Snapshot.Get("Before_ATF3.jpg","ATF");
+        Snapshot.Get("Before_ATF3.jpg","ATF");
         Logger.Write("has entered into VerifyATF()", "TraceRoute");
         Helper.Verify(new RequestDetails(
             inputCommand: "ATF=3",

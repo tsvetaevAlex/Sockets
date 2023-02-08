@@ -1,24 +1,16 @@
 ﻿
-using simicon.automation.Utils;
-
-namespace simicon.automation.Tests;
-
-public static class AutomationPrepareEnvironment
+namespace simicon.automation.Tests
 {
-    [Test, Description("Attempt to Prepare Test Environment (Device)")]
-    [OneTimeSetUp]
-    public static void VerifyTestEnvironment()
+    public static class AutomationPrepareEnvironment
     {
-        Logger.Write($"we are in '[OneTimeSetUp]', isEnvironmentPrepared: {Globals.isEnvironmentPrepared}", "TraceRoute");
-        if (!Globals.isEnvironmentPrepared)
+        [Test, Description("Attempt to Prepare Environment")]
+        public static void VerifyTestEnvironment()
         {
-            PrepareEnvironment.Run();
+            if (!Globals.isEnvironmentPrepared)
+            {
+                PrepareEnvironment.Run();
+            }
         }
-    }
-    [OneTimeTearDown]
-    public static void TearDown()
-    {
-        Logger.Write("we are in [OneTimeTearDown]", "TraceRoute");
-        Globals.isEnvironmentPrepared = false;
+
     }
 }
