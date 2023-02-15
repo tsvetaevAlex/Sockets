@@ -1,64 +1,64 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using static simicon.automation.Utils.Enums;
+using Xamarin.Forms;
 
 namespace simicon.automation;
 
-public class Sensorapp
+public static class Sensorapp
 {
-    private TestSuite suite;
-    private Helper _helper;
-    public Sensorapp(ConnectionPointers cp)
+
+
+    public static void UpdateSensorappProperty()
     {
-        Console.WriteLine("!!!!!!!!!!!!!!Checkpoint Senoslapp  ConnectionPointers constructor");
-        _helper = new Helper(cp);
+
+        Logger.Write("has entered into UpdateSensorappProperty", "TraceRoute");
+        Logger.Write("has entered into UpdateSensorappProperty", "sensorapp");
+        
+
+        string SensorappUdateRequest =
+        "sqlite3 /tftpboot/boot/conf/kris.sql3 \"insert or replace into tblSettings (tName,tValue) values ('SENSORAPP_MSENSORATPORT','')\"";
+
+
+        string SensorappSelectExpectedContent = "";
+        SshSocket.Send(SensorappUdateRequest, "");
+        SshSocket.Send(SensorappUdateRequest, SensorappSelectExpectedContent);
     }
 
-    public void Prepare()
+    public static void VerifySensorappProperty()
     {
-        Console.WriteLine("!!!!!!!!!!!!!!Checkpoint SEnsorapp Prepare");
+    Logger.Write("has entered into VerifySensorappProperty", "TraceRoute");
+    Logger.Write("has entered into VerifySensorappProperty", "sensorapp");
+    bool isExpcted = false;
+    bool isExit0 = false;
+        #region Verify value of updated Sensorapp Property
+        string SensorappSelectRequest = "sqlite3 /tftpboot/boot/conf/kris.sql3 \"select * from tblSettings\" | grep SENSORAPP_MSENSORATPORT";
+    string expectedContent = "SENSORAPP_MSENSORATPORT|";
+    SshSocket.Send(SensorappSelectRequest, expectedContent);
+    }
+    #endregion
 
-        #region update Property
-        //TODO: move to here
-        Console.WriteLine("-------------------------------[Update SEnsorApp Property in DB]-------------------------------");
-        Envelope UpdateQuery = new Envelope(
-        testname: "SQL insert or replace",
-        request: "sqlite3 /tftpboot/boot/conf/kris.sql3 \"insert or replace into tblSettings (tName,tValue) values ('SENSORAPP_MSENSORATPORT','')\"",
-        expectedContent: "",
-        vt: VerificationType.None
-        );
-        _helper.Execute(UpdateQuery);
-        Console.WriteLine("-------------------------------[Update SEnsorApp Property in DB Completed]---------------------");
+    public static void SensorappRestart()
+    {
 
-        #endregion
+    Logger.Write("has entered into SensorappRestart", "TraceRoute");
+    Logger.Write("has entered into SensorappRestert", "sensorapp");
 
-        #region Verify Property
-        Console.WriteLine("-------------------------------[Verify SEnsorApp Property in DB]-------------------------------");
+    #region Srvice Restart
+    string RestartQuery = "sv restart /service/sensorapp0";
+    string expectedContent = "ok: run: /service/sensorapp0:";
 
-        Envelope SelectQuery = new Envelope(
-            testname: "CamTest002",
-            request: "sqlite3 /tftpboot/boot/conf/kris.sql3 \"select * from tblSettings\" | grep SENSORAPP_MSENSORATPORT",
-        expectedContent: "SENSORAPP_MSENSORATPORT|",
-            vt: VerificationType.Equal
-            );
-        _helper.Execute(SelectQuery);
-        Console.WriteLine("-------------------------------[Verify SEnsorApp Property in DB Completed]---------------------");
-        #endregion
+    SshSocket.Send(RestartQuery, expectedContent);
 
-        #region Srvice Restart
-        Console.WriteLine("-------------------------------[Restart SEnsorApp Service]-------------------------------");
+    //TODO: processing sv restart sbed\ wait receive
+    //_dDeviceSSHSocket.Send(ConnectionPointers.DeviceSshSocket, SelectRequest, VerifyexpectedContent, VerificationType.Contains);
+    #endregion
+    }
 
-        Envelope RestartQuery = new Envelope(
-        testname: "CamTest004(sv restart /service/sensorapp0)",
-        request: "sv restart /service/sensorapp0",
-        expectedContent: "ok: run: /service/sensorapp0:",
-        vt: VerificationType.Contains
-        );
-        _helper.Execute(RestartQuery);
-        Console.WriteLine("-------------------------------[Restart SEnsorApp Serviceompleted]-----------------------");
-        #endregion
-    }// end of prepare
-}// end of class Sensorapp
+
+        }// end of class Sensorapp
 

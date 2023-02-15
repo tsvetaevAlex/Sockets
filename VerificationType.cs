@@ -1,6 +1,9 @@
-﻿public enum VerificationType
+﻿namespace simicon.automation;
+
+public enum VerificationType
 {
     Equal,
     Contains,
-    None
+    None,
+    NoResp
 }

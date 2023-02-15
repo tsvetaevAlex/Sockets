@@ -1,19 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace simicon.automation.Gen2;
 
-namespace automation
+public static class Enums
 {
-    public class Enums
-    {
 
-        enum VerificationType
-        {
-            Equal,
-            Contains,
-            None
-        }
+    public enum VerificationType
+    {
+        Equal,
+        Contains,
+        None,
+        NoResp
     }
+    public enum SensorType
+    {
+        Color,
+        BW,
+        Undefined
+    }
+
 }

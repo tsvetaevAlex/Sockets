@@ -10,24 +10,36 @@
 
   <ItemGroup>
     <Compile Remove="ReportFolder\**" />
-    <Compile Remove="Tests\**" />
     <EmbeddedResource Remove="ReportFolder\**" />
-    <EmbeddedResource Remove="Tests\**" />
     <None Remove="ReportFolder\**" />
-    <None Remove="Tests\**" />
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="ATkeyWords.cs" />
+    <Compile Remove="Camera.cs" />
     <Compile Remove="CommandHelper - Copy.cs" />
     <Compile Remove="Destination.cs" />
+    <Compile Remove="Device.cs" />
+    <Compile Remove="Entities.cs" />
+    <Compile Remove="Envelope.cs" />
+    <Compile Remove="ExchangeDataBuffer.cs" />
+    <Compile Remove="Helper - bwckup 11-7-20222-19 before rollbeck to 10-28Copy.cs" />
+    <Compile Remove="Helper.cs" />
+    <Compile Remove="OutputVerification.cs" />
+    <Compile Remove="Protoype.cs" />
+    <Compile Remove="SocketStream.cs" />
+    <Compile Remove="StreamSocket.cs" />
     <Compile Remove="TestEnvironment.cs" />
+    <Compile Remove="TestSuite.cs" />
     <Compile Remove="TestSuiteHelper.cs" />
+    <Compile Remove="Tests\AutomationPrepareEnvironment.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
-    <PackageReference Include="NLog.Extensions.Logging" Version="5.1.0" />
     <PackageReference Include="NUnit" Version="3.13.3" />
+    <PackageReference Include="NUnit.Console" Version="3.16.0" />
+    <PackageReference Include="NUnit.ConsoleRunner" Version="3.16.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
     <PackageReference Include="NUnit.Analyzers" Version="3.3.0" />
     <PackageReference Include="coverlet.collector" Version="3.1.2" />
