@@ -15,6 +15,10 @@ public static class Logger
     private static string _logFile = "";
     private static string prefix = "";
     private static readonly object thisLock = new object();
+    public static string sTag = "stability";
+    public static string fTag = "failure";
+    public static string tTag = "TraceRoute";
+
     public static void InitLogger([CallerMemberName] string memberName = "", [CallerLineNumber] int codeLine = 0)
     {
 

@@ -78,7 +78,20 @@ public static class SimpleTests
             TAG: "ATk"
         ));
     }
-    
+
+    [Test]
+    public static void TestCase0005_1__ATK1_BelowLowBorder()
+
+    {
+        Logger.Write("has entered into TestCase00052__ATK1_BelowLowBorder()", "TraceRoute");
+        Logger.Write("Commnd: ATK; Expected Text Content: Too low level,", "ATK1");
+        Helper.Verify(new RequestDetails(
+            inputCommand: "ATk1=50",
+            expectedTextContent: "Too low level,",
+            TAG: "ATk"
+        ));
+    }
+
     [Test]
     public static void TestCase0006_NonParameterized_ATL()
     {

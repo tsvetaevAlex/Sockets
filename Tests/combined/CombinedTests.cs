@@ -3,71 +3,104 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using simicon.automation.Tests.NonParameterized;
+using simicon.automation.Tests.parameterized;
 using simicon.automation.Utils;
 using Xamarin.Forms;
 
 namespace simicon.automation.Tests.combined;
 
 public static class CombinedTests
-{//Description("Test description here")
+{
 
-
-
-    [Test, Description("set ATA value to 0.")]
-    public static void atc001_Set_ATA0()
+    [Test, Description("Verify that aTG changeable When_ATA0.")]
+    public static void TestCase00024_Combined_VerifyThat_ATG_channableWhen_ATA0()
     {
-        Logger.Write("has entered into atc001_Set_ATA0()", "TraceRoute");
+        parameterizedTests.TestCase0022_Parameterized_SetATA0();
+        Logger.Write("has entered into TestCase0001_Parameterized_SetATA0()", "TraceRoute");
         Helper.Verify(new RequestDetails
         (
-            inputCommand: "ATA=0",
-            expectedTextContent: "AGC: (0), OFF",
-            TAG: "ATA0"
+            inputCommand: "ATG = 500",
+            expectedTextContent: "GAIN: 480",
+            TAG: "ATA0_ATG"
         ));
     }
-    [Test, Description("Verify that atg channable when ATA is 0.")]
-    public static void atc002_ATG0_ATA0()
+
+    [Test, Description("Verify that aTG changeable When_ATA1.")]
+    public static void TestCase00025_Combined_VerifyThat_ATG_NotChannableWhen_ATA1()
     {
-        Logger.Write("has entered into VerifyATG(0)", "TraceRoute");
+        parameterizedTests.TestCase0023_Parameterized_SetATA1();
+        Logger.Write("has entered into TestCase0001_Parameterized_SetATA0()", "TraceRoute");
         Helper.Verify(new RequestDetails
         (
-            inputCommand: "ATG=0",
-            expectedTextContent: "GAIN: 0",
-            TAG: "ATG"
+            inputCommand: "ATG = 500",
+            expectedTextContent: "ERR",
+            TAG: "ATA1_ATG"
         ));
     }
-    [Test, Description("set ATA value to 1")]
-    public static void atc003_Set_ATA1()
-    {
-        Logger.Write("has entered into atc003_Set_ATA1()", "TraceRoute");
-        //string resp = Helper.Send("AT=0", "CombinedTests", true);
-        Helper.Verify(new RequestDetails(
-            inputCommand: "ATA=1",
-            expectedTextContent: "AGC: (1), ON",
-            TAG: "ATA1"
-            ));
 
-    }
-    [Test, Description("Verify that ATG non changeable when ATA is 1. Expeted response is 'ERR'")]
-    public static void Atp004_ATG6000_ATA1()
+
+    [Test, Description("Verify that ATS changeable When_ATA1.")]
+    public static void TestCase00024_Combined_VerifyThat_ATG_NotChannableWhen_ATA1()
     {
-        Logger.Write("has entered into Atp02VerifyATG6000_ATA1()", "TraceRoute");
+        parameterizedTests.TestCase0023_Parameterized_SetATA1();
+        Logger.Write("has entered into TestCase00024Combined_VerifyThat_ATG_channableEhen_ATA1()", "TraceRoute");
         Helper.Verify(new RequestDetails
-            (
-                inputCommand: "ATG=6000",
-                expectedTextContent: "ERR",
-                TAG: "ATG"
-            ));
+        (
+            inputCommand: "ATS=7",
+            expectedTextContent: "ERR",
+            TAG: "ATA1_ATS"
+        ));
+    }
+    [Test, Description("Verify that ATS changeable When_ATA0.")]
+    public static void TestCase00029_Combined_VerifyThat_ATS_channableWhen_ATA0()
+    {
+        parameterizedTests.TestCase0022_Parameterized_SetATA0();
+        Logger.Write("has entered into TestCase0001_Parameterized_SetATA0()", "TraceRoute");
+        Helper.Verify(new RequestDetails
+        (
+            inputCommand: "ATS=7",
+            expectedTextContent: "SHUT: 7",
+            TAG: "ATA_ATS"
+        ));
+    }
+    [Test, Description("Verify that ATS changeable When_ATA1.")]
+    public static void TestCase00030_Combined_VerifyThat_ATS_NotChannableWhen_ATA1()
+    {
+        parameterizedTests.TestCase0023_Parameterized_SetATA1();
+        Logger.Write("has entered into TestCase00024Combined_VerifyThat_ATG_channableEhen_ATA1()", "TraceRoute");
+        Helper.Verify(new RequestDetails
+        (
+            inputCommand: "ATS=7",
+            expectedTextContent: "SHUT: 7",
+            TAG: "ATA0_ATS"
+        ));
     }
 
-    [Test, Description("verify that atg displays status when ATA is 1")]
-    public static void Atc005_ATG_ATA1()
-    {
-        Logger.Write("has entered Atp02VerifyATG_ATA1()", "TraceRoute");
-        Helper.Verify(new RequestDetails(
-            inputCommand: "",
-            expectedTextContent: "",
-            TAG: "",
-            returnFullTextOfContent: false
-            ));
+
+    [Test, Description("Verify that ATL changeable When_ATA0.")]
+    public static void TestCase00026_Combined_VerifyThat_ATL_channableWhen_ATA0()
+    {//Max exp
+        parameterizedTests.TestCase0022_Parameterized_SetATA0();
+        Logger.Write("has entered into TestCase0001_Parameterized_SetATA0()", "TraceRoute");
+        Helper.Verify(new RequestDetails
+        (
+            inputCommand: "ATL=5",
+            expectedTextContent: "Max exp: ",
+            TAG: "ATA_ATL"
+        ));
     }
-}
+    [Test, Description("Verify that ATL changeable When_ATA1.")]
+    public static void TestCase00027_Combined_VerifyThat_ATL_NotChannableWhen_ATA1()
+    {
+        parameterizedTests.TestCase0023_Parameterized_SetATA1();
+        Logger.Write("has entered into TestCase00024Combined_VerifyThat_ATG_channableEhen_ATA1()", "TraceRoute");
+        Helper.Verify(new RequestDetails
+        (
+            inputCommand: "ATL=7",
+            expectedTextContent: "ERR",
+            TAG: "ATA1_ATL"
+        ));
+    }
+
+}// end of class

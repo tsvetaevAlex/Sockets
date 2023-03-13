@@ -13,7 +13,6 @@ public static class ATF
     public static void TestCase00017Parameterized_ATF0()
     {
         Logger.Write("has entered into TestCase00017Parameterized_ATF0()", "TraceRoute");
-        Helper.Verify("ATF", "Cam flip: Off", "ATF");
         Helper.Verify(new RequestDetails(
             inputCommand: "ATF=0",
             expectedTextContent: "Cam flip: Off",
@@ -26,7 +25,6 @@ public static class ATF
     {
         Snapshot.Get("BeforeATF1.jpg", "ATF");
         Logger.Write("has entered into TestCase00018Parameterized_ATF1()", "TraceRoute");
-        Helper.Verify("ATF=1", "Cam flip: On", "ATF");
         Helper.Verify(new RequestDetails(
             inputCommand: "ATF=1",
             expectedTextContent: "Cam flip: On",
@@ -39,24 +37,24 @@ public static class ATF
     public static void TestCase00019Parameterized_ATF2()
     {
         Logger.Write("has entered into TestCase0019Parameterized_ATF2()", "TraceRoute");
-        Helper.Verify("ATF", "Cam flip: Off", "ATF");
         Helper.Verify(new RequestDetails(
             inputCommand: "ATF=2",
             expectedTextContent: "Cam flip: Vert",
-            TAG: "ATF"
+            TAG: "ATF",
+            TargetImageFilename: "AfterATf2.jpg"
             ));
     }
 
     [Test]
     public static void TestCase00020Parameterized_ATF3()
     {
-        Snapshot.Get("BeforeATF1.jpg", "ATF");
+        Snapshot.Get("BeforeATF1.jpg", "ATF3");
         Logger.Write("has entered into TestCase00020Parameterized_ATF3()", "TraceRoute");
-        Helper.Verify("ATF=1", "Cam flip: On", "ATF");
         Helper.Verify(new RequestDetails(
             inputCommand: "ATF=3",
             expectedTextContent: "CCam flip: Mirror",
-            TAG: "ATF"
+            TAG: "ATF",
+            TargetImageFilename:"AfterATf3.jpg"
         ));
         Snapshot.Get("AfterATF1.jpg", "ATF");
     }

@@ -15,7 +15,11 @@ public static class ConnectionPointers
     private static ShellStream _DeviceStream;// secured ftp to device. to be able download files(snaphots) from device 
     private static ShellStream _cameraStream;
     public static string TAG = "ConnectionPointers";
-    public static string sTAG = "stability";
+    public static string fTag = "failure";
+
+
+
+
 
     /// <summary>
     /// initializa all reuqired connections: SSH  and SFTP to device, console to Camera
@@ -46,17 +50,17 @@ public static class ConnectionPointers
             }
             else
             {
-                Logger.Write("GetCameraStream.if (_cameraStream.CanRead) FALSE (inside if)", sTAG);
-                Logger.Write("attempt to create a nw pcamera connection(picocom)", sTAG);
+                Logger.Write("GetCameraStream.if (_cameraStream.CanRead) FALSE (inside if)", TAG);
+                Logger.Write("attempt to create a nw pcamera connection(picocom)", TAG);
             Logger.Write($"we are in ConnectionPointers.GetCameraStream outbound stream is :'{_cameraStream}'.", TAG);
-            Logger.Write("attempt to create a nw pcamera connection(picocom)", sTAG);
+            Logger.Write("attempt to create a nw pcamera connection(picocom)", TAG);
                 ShellStream pic1 = AuthorizePicocom();
                 if (pic1 != null)
                 {
-                    Logger.Write($"New not null connection created: {pic1}", sTAG);
+                    Logger.Write($"New not null connection created: {pic1}", TAG);
                     if (pic1.CanRead)
                     {
-                        Logger.Write("New nol null and .CanRead", sTAG);
+                        Logger.Write("New nol null and .CanRead", TAG);
                         return pic1;
                     }
                 }
@@ -74,8 +78,8 @@ public static class ConnectionPointers
         else
         {
             string errMessage = "We are in ConnectionPointers.GetCameraStream, No connectionObject to Camera it null and/or not CanRead.";
-            Logger.Write(errMessage, sTAG);
-            Logger.Write("Attempt to picocom agagin...", sTAG);
+            Logger.Write(errMessage, TAG);
+            Logger.Write("Attempt to picocom agagin...", TAG);
             ShellStream? pic2 = AuthorizePicocom();
             Assert.Fail("No connectionObject to Camera");
             //_cameraStream.Dispose;
@@ -192,6 +196,12 @@ public static class ConnectionPointers
                         TAG);
                     Globals.isEnvironmentPrepared= true;
                     return stream;
+                }
+                if (buffer.Contains("'FATAL"))
+                {
+                    string ERRmsg = "TestRun Failure. Ccnnot connect to camera service. Stream port busy.";
+                    Logger.Write(ERRmsg, fTag);
+                    Assert.Fail(ERRmsg);
                 }
             }// end of while (stream.DataAvailable)
         }// end of if (stream.DataAvailable)

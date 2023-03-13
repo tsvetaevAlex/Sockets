@@ -1,0 +1,36 @@
+#2.99 path: /home/test/autotest_sw
+
+# Define the stages of the CI/CD pipeline
+image: mcr.microsoft.com/dotnet/sdk:7.0
+
+stages:
+  - build
+  - test
+
+# Define the job to build the C# project
+build:
+   stage: build
+   script:
+    - echo "building..."
+    - mkdir Docker
+    - cd Docker
+    - mkdir src
+    - mkdir artifacts
+    - cd src
+    - git clone http://tsvetaev:kc71zsgb@192.168.2.51/qa/autotest_sw/-/tree/master
+    - cd autotest_sw
+    - nuget restore automation.sln
+    - dotnet build -c Release 'automation.sln'
+   artifacts:
+     paths:
+      - 'Docker/artifacts'
+
+# Define the job to run the NUnit test cases
+test:
+  stage: test
+  image: mcr.microsoft.com/dotnet/sdk:latest
+  script:
+    - echo "running tests"
+    - dotnet test --configuration Release --logger "console;verbosity=detailed"
+    - dotnet test --configuration Release --logger "console;verbosity=detailed"
+    - mono ./tools/NUnit.ConsoleRunner.3.12.0/tools/nunit3-console.exe /home/test/autotest_sw.dll

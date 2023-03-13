@@ -6,6 +6,11 @@ namespace simicon.automation;
 
 public static class Helper
 {
+    #region aliases forLogFiles
+    public static string sTag = "stability";
+    public static string fTag = "failure";
+    public static string tTag = "TraceRoute";
+    #endregion
     //private StringBuilder entireResponse = new StringBuilder();
 
     private static string FullResponse = "";
@@ -95,7 +100,7 @@ public static class Helper
         string TAG = request.tag;
         string Command = request.Command;
         string expectedTextContent = request.ExpectedContent;
-
+        string imageFileName = request.ImageFilename;
         string fullOutput = String.Empty;
         fullOutput= Send(Command, expectedTextContent, TAG,true);
         
@@ -122,7 +127,13 @@ public static class Helper
             string buffer = "";
             bool isKeyWordReceived = false;
             Logger.Write($"connectionObject VerifyCameraSuite. camera stream pointer:  '{camera}'", TAG);
-//WHILE
+            //WHILE
+            #region Receiving Response Content
+            if (expectedTextContent == "")
+            {
+                isKeyWordReceived = true;
+            }
+
             while (true)
             {
                 try
@@ -134,7 +145,8 @@ public static class Helper
                         {
                             Logger.Write($"\r\nresponse line: {buffer}", TAG);
                             entireResponse.Append(buffer);
-//VERIFICATION
+            #endregion
+                            //VERIFICATION
                             #region instant verification
 
                             if (fullOutput.Contains(expectedTextContent))
@@ -167,6 +179,7 @@ public static class Helper
                                 string conclusionMessage =
                                     $"AT Command: {Command}, Verification successfully passed. Expected content and OK #tag received";
                                 Logger.Write(conclusionMessage, TAG);
+                                Snapshot.Get(request.ImageFilename, request._ImageTag);
                                 Assert.Pass(conclusionMessage);
                             }
                             #endregion
@@ -196,6 +209,7 @@ public static class Helper
             {
                 string conclusionMessage =
                     $"AT Command: {Command}, Verification successfully passed. Expected content and OK #tag received";
+                Snapshot.Get(request.ImageFilename,request._ImageTag);
                 Logger.Write(conclusionMessage, TAG);
                 Assert.Pass(conclusionMessage);
             }

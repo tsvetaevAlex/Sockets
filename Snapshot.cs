@@ -10,103 +10,121 @@ public static class Snapshot
     public static string pswd = ConnectionPointers.Password;
     private static string _tag = "Snapshots";
     private static string sTAG = "stability";
+    public static string fTag = "failure";
     private static SshClient DeviceSsocket = ConnectionPointers.GetDeviceSSH();
     private static SftpClient DeviceSFTP = ConnectionPointers.GEtDeviceSFTP();
     private static ShellStream DeviceStream = ConnectionPointers.GetCameraStream();
     private static string tPrefix = "at simicon.automation.Snapshot.";
     //TODO update to robeject return;
-    private static object ChooseSFTPConnection()
+
+
+    public static bool RrefreshShapshot()
     {
-        Logger.Write("=====================>Verivication of [ConnectionPointers._DeviceSFTP]", _tag);
+        string GetTimeQUery = "ls --full-time 1.jpg | awk '{print $7}'";
+        int maxTC = Globals.MAXTryCount; //maximum ammount of attempts to download shanpshot;
+        Logger.Write("we are in Snapshot.RrefreshShapshot", "TraceRoute");
+        
+        int i = 0;// current attempt number;
+        var initial = SshSocket.GetResponse(GetTimeQUery);
+        string current = String.Empty;
+        bool isRefreshed = false;
+        Logger.Write($"{tPrefix}RrefreshShapshot: existing image.creatino time is: {initial}", _tag);
+        Logger.Write($"{tPrefix}RrefreshShapshot: existing image.creatino time is: {initial}", sTAG);
 
-        Logger.Write("we are in Snapshot.ChooseSFTPConnection", "TraceRoute");
-        if ((DeviceSFTP != null) && (DeviceSFTP.IsConnected))
+        while (i < maxTC)
         {
-            Logger.Write("I am (Automation Bot (my name is rusty iron mind, I suggest initially to try pointer object: static [pointer _DeviceSFTP a few momenta go it was not null and beeing connected ))", _tag);
-            actualSftp = DeviceSFTP;
-            return actualSftp;
+            current = SshSocket.GetResponse(GetTimeQUery);
+            i++;
+            if (current != initial)
+            {
+                isRefreshed = true;
+                Logger.Write($"{tPrefix}RrefreshShapshot:current snapshot time is:{current}, id dnspdhot refreshed: {isRefreshed}", _tag);
+                break;
+            }
         }
-        else if ((Globals.DeviceSFTP != null) && (Globals.DeviceSFTP.IsConnected))
+        if (isRefreshed)
         {
-            Logger.Write("I'm Friend of rusty iron mind, he missed the choice of executor. I propose tou to ask: Globals._DeviceSFTP", _tag);
-            actualSftp = Globals.DeviceSFTP;
-            return actualSftp;
+            return isRefreshed;
         }
-
-        Logger.Write("our existing connections are not able to work due to personal reason nneed  to create a new one:", _tag);
-
-        actualSftp = new SftpClient(host, user, pswd);
-        actualSftp.Connect();
-        if ((actualSftp != null) && (actualSftp.IsConnected))
+        else
         {
-            return actualSftp;
+            string ERRmsg = " Exit Code: 503. Run Failure. Ccnnot refresh snapshot from sensor. pleate verify camera and/or service/scpirt 1.sh.";
+            Logger.Write(ERRmsg, fTag);
+            Assert.Fail(ERRmsg);
+            return false;
         }
-        return null;
-    }
-
+    }//End of refreshShapshot
 
     public static void Create()
     {
-        // 1.tp check creation dateTime: ls -l /tftpboot/boot/1.jpg | awk '{print $6$7$8}'
-        // 2.-//- ls -l /tftpboot/boot/1.jpg | awk '{print $6} {print $7} {print $8}'
-        //SftpClient _Sftp = (SftpClient)ChooseSFTPConnection();
-        SftpClient actualSftp = new SftpClient(host, user, pswd);
-        Logger.Write("onnectionPointers._DeviceSFTP is not null", _tag);
-        Logger.Write($"Snapshot.Create.actualSftp: ->{actualSftp}<-", sTAG);
-        DeviceSFTP = actualSftp;
-        Thread.Sleep(1000);
-
-        if (DeviceSFTP != null)
+        if (!RrefreshShapshot())
         {
-            Logger.Write("onnectionPointers._DeviceSFTP is not null", _tag);
-            Logger.Write($"onnectionPointers._DeviceSFTP is connected: {DeviceSFTP.IsConnected}", _tag);
-            Logger.Write($"Check ConnectionPointers._DeviceSFTP== {DeviceSFTP}; is it connected?:{DeviceSFTP.IsConnected}", _tag);
-
-            if (DeviceSFTP.IsConnected)
-            {
-                Logger.Write("INFO: ConnectionPointers._DeviceSFTP is not null and Connected!!!", _tag);
-                Logger.Write("INFO: suggested it as valid connectionObject", _tag);
-            }
-
+            Logger.Write($"{tPrefix}Create: RrefreshShapshot Return False",fTag);
+            Environment.Exit(503);
         }
-        Console.WriteLine($"------------------------------------------->we are in create snapshot, actualSftp connetion:[{DeviceSFTP}]");
-        if (DeviceSFTP != null)
+        else
         {
-            //SuggestedConnection.isNull = false;
-            try
+            // 1.tp check creation dateTime: ls -l /tftpboot/boot/1.jpg | awk '{print $6$7$8}'
+            // 2.-//- ls -l /tftpboot/boot/1.jpg | awk '{print $6} {print $7} {print $8}'
+            SftpClient actualSftp = new SftpClient(host, user, pswd);
+            Logger.Write("onnectionPointers._DeviceSFTP is not null", _tag);
+            Logger.Write($"Snapshot.Create.actualSftp: ->{actualSftp}<-", sTAG);
+            DeviceSFTP = actualSftp;
+            Thread.Sleep(1000);
+
+            if (DeviceSFTP != null)
             {
+                Logger.Write("onnectionPointers._DeviceSFTP is not null", _tag);
+                Logger.Write($"onnectionPointers._DeviceSFTP is connected: {DeviceSFTP.IsConnected}", _tag);
+                Logger.Write($"Check ConnectionPointers._DeviceSFTP== {DeviceSFTP}; is it connected?:{DeviceSFTP.IsConnected}", _tag);
 
                 if (DeviceSFTP.IsConnected)
                 {
-                    //SuggestedConnection.isConnected = true;
-                    //  SuggestedConnection.Connection = ConnectionPointers._DeviceSFTP;
-                    //ConnectionPointers._DeviceSFTP.ChangeDirectory(Globals.remoteDirectory);
+                    Logger.Write("INFO: ConnectionPointers._DeviceSFTP is not null and Connected!!!", _tag);
+                    Logger.Write("INFO: suggested it as valid connectionObject", _tag);
                 }
 
             }
-            catch (Exception e)
+            Console.WriteLine($"------------------------------------------->we are in create snapshot, actualSftp connetion:[{DeviceSFTP}]");
+            if (DeviceSFTP != null)
             {
-                Logger.Write($"ConnectionPointers.SftpSocket is null in SnapShot.Create()in Attemp to use it exception was thrown:{e.ToString}", _tag);
-            }
-            Logger.Write($"{tPrefix}: ConnectionPointers.SftpSocket is null in SnapShot.Create()", _tag);
-            Logger.Write($"{tPrefix}: Attempt to connect using saved Global pointer intead of local.", _tag);
-            if (Globals.DeviceSFTP != null)
-            {
+                //SuggestedConnection.isNull = false;
                 try
                 {
-                    Globals.DeviceSFTP.ChangeDirectory(Globals.remoteDirectory);
+
+                    if (DeviceSFTP.IsConnected)
+                    {
+                        //SuggestedConnection.isConnected = true;
+                        //  SuggestedConnection.Connection = ConnectionPointers._DeviceSFTP;
+                        //ConnectionPointers._DeviceSFTP.ChangeDirectory(Globals.remoteDirectory);
+                    }
 
                 }
-                catch (Exception ex)
+                catch (Exception e)
                 {
-                    Logger.Write($"{tPrefix} :Saved Global actualSftp pointer is also unsuitable", _tag);
-                    Assert.Fail($"{tPrefix} : unavailable to continue automation tests execution due to  SFTP connectionObject to Device not established; {ex.ToString}");
+                    Logger.Write($"ConnectionPointers.SftpSocket is null in SnapShot.Create()in Attemp to use it exception was thrown:{e.ToString}", _tag);
                 }
+                Logger.Write($"{tPrefix}: ConnectionPointers.SftpSocket is null in SnapShot.Create()", _tag);
+                Logger.Write($"{tPrefix}: Attempt to connect using saved Global pointer intead of local.", _tag);
+                if (Globals.DeviceSFTP != null)
+                {
+                    try
+                    {
+                        Globals.DeviceSFTP.ChangeDirectory(Globals.remoteDirectory);
+
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Write($"{tPrefix} :Saved Global actualSftp pointer is also unsuitable", _tag);
+                        Assert.Fail($"{tPrefix} : unavailable to continue automation tests execution due to  SFTP connectionObject to Device not established; {ex.ToString}");
+                    }
 
 
+                }
             }
 
-        }
+        }//end of if (!RrefreshShapshot())
+
         /*NOTES:
         grt shanshot creatinon DateTime stamp: ls -l .1.jpg | awk '{print $6$7$8}'
         run dcript to refresh shapshot: nc 127.0.0.1 4070 -e ./1.sh
@@ -128,7 +146,7 @@ public static class Snapshot
         Thread.Sleep(1000);
         int attempt = 1;
         bool isOK = false;
-        while (attempt++ <= Globals.TryCount)
+        while (attempt++ <= Globals.MAXTryCount)
         {
             if (bornDateExistingFile != bornDateRefreshedFile)
             {
@@ -151,9 +169,12 @@ public static class Snapshot
 
     }// end of create()
 
-    public static void Get(string localFilename, string ATtag = "")
+    public static void Get(string localFilename, string ATtag = "",bool iscreated = false)
     {
-        Create();
+        if (!iscreated)
+        {
+            Create();
+        }
 
         string imageFolder = Logger._LogFolder;
         var LocalOutputFilePath = $"{imageFolder}\\SnapShots\\{ATtag}";

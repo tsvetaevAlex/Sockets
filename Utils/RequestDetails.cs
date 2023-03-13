@@ -9,16 +9,20 @@ public class RequestDetails
     public bool returnFullTextResponse = false;
     public bool returnFullTextResponseResponse = false;
     public string ImageFilename = "";
+    public string _ImageTag = "";
 
-    public RequestDetails(string inputCommand, string expectedTextContent, string TAG,
+    public RequestDetails
+        (string inputCommand, string expectedTextContent, string TAG,
         bool returnFullTextOfContent = false,
-         string TargetImageFilename = "")
+         string TargetImageFilename = "",
+         string imageTag = "")
     {
-        Command= inputCommand;
+        Command = inputCommand;
         ExpectedContent = expectedTextContent;
         tag = TAG;
-        returnFullTextResponse= returnFullTextOfContent;
+        returnFullTextResponse = returnFullTextOfContent;
         ImageFilename = TargetImageFilename;
+        _ImageTag = imageTag;
     }
 
 }
