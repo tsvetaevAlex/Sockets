@@ -1,105 +1,111 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using simicon.automation.Tests.NonParameterized;
-using simicon.automation.Tests.parameterized;
-using simicon.automation.Utils;
-using Xamarin.Forms;
+﻿using simicon.automation.Tests;
 
-namespace simicon.automation.Tests.combined;
+namespace simicon.automation.Tests;
 
-public static class CombinedTests
+public class CombinedTests : TestRun
 {
-
     [Test, Description("Verify that aTG changeable When_ATA0.")]
-    public static void TestCase00024_Combined_VerifyThat_ATG_channableWhen_ATA0()
+    public void TestCase00019_Combined_VerifyThat_ATG_channable_When_ATA0()
     {
-        parameterizedTests.TestCase0022_Parameterized_SetATA0();
-        Logger.Write("has entered into TestCase0001_Parameterized_SetATA0()", "TraceRoute");
-        Helper.Verify(new RequestDetails
+        reportRow.Wipe();
+        string testcaseName = "TestCase00019";
+        reportRow.ID = testcaseName;
+        reportRow.Command = "ATG = 500";
+        log.Info($"@DEBUG->  simicon.automation.Tests.combined. {testcaseName};" + NewLine);
+        sharedTests.TestCase_SetATA0();
+        log.TestCase("\\nTest Case: TestCase00023_Combined_VerifyThat_ATG_channable_When_ATA0");
+        helper.Verify(new RequestDetails
         (
-            inputCommand: "ATG = 500",
-            expectedTextContent: "GAIN: 480",
-            TAG: "ATA0_ATG"
+            inputCommand: reportRow.Command,
+            expectedTextContent: "GAIN: 480"
+        ));
+    }
+
+    [Test, Description("Verify that ATS nonchangeable When_ATA1.")]
+    public void TestCase00020Combined_VerifyThat_ATG_NonChannableWhen_ATA1()
+    {
+        reportRow.Wipe();
+        reportRow.ID= "TestCase00020";
+        sharedTests.TestCase_SetATA1 ();
+        reportRow.Command = "ATS=7";
+        log.TestCase("\\nTest Case: TestCase00024_Combined_VerifyThat_ATG_NonChannableWhen_ATA1");
+        helper.Verify(new RequestDetails
+        (
+            inputCommand: reportRow.Command,
+            expectedTextContent: "ERR"
         ));
     }
 
     [Test, Description("Verify that aTG changeable When_ATA1.")]
-    public static void TestCase00025_Combined_VerifyThat_ATG_NotChannableWhen_ATA1()
+    public void TestCase00021_Combined_VerifyThat_ATG_NotChannableWhen_ATA1()
     {
-        parameterizedTests.TestCase0023_Parameterized_SetATA1();
-        Logger.Write("has entered into TestCase0001_Parameterized_SetATA0()", "TraceRoute");
-        Helper.Verify(new RequestDetails
+        reportRow.Wipe();
+        reportRow.ID= "TestCase00021";
+        reportRow.Command = "ATG = 500";
+        sharedTests.TestCase_SetATA1();
+        log.TestCase("\\nTest Case: TestCase00025_Combined_VerifyThat_ATG_NotChannableWhen_ATA1");
+        log.Route("Test Case: TestCase00025_Combined_VerifyThat_ATG_NotChannableWhen_ATA1");
+        helper.Verify(new RequestDetails
         (
-            inputCommand: "ATG = 500",
-            expectedTextContent: "ERR",
-            TAG: "ATA1_ATG"
+            inputCommand: reportRow.Command,
+            expectedTextContent: "ERR"
         ));
     }
 
-
-    [Test, Description("Verify that ATS changeable When_ATA1.")]
-    public static void TestCase00024_Combined_VerifyThat_ATG_NotChannableWhen_ATA1()
-    {
-        parameterizedTests.TestCase0023_Parameterized_SetATA1();
-        Logger.Write("has entered into TestCase00024Combined_VerifyThat_ATG_channableEhen_ATA1()", "TraceRoute");
-        Helper.Verify(new RequestDetails
-        (
-            inputCommand: "ATS=7",
-            expectedTextContent: "ERR",
-            TAG: "ATA1_ATS"
-        ));
-    }
     [Test, Description("Verify that ATS changeable When_ATA0.")]
-    public static void TestCase00029_Combined_VerifyThat_ATS_channableWhen_ATA0()
+    public void TestCase00022_Combined_VerifyThat_ATS_channableWhen_ATA0()
     {
-        parameterizedTests.TestCase0022_Parameterized_SetATA0();
-        Logger.Write("has entered into TestCase0001_Parameterized_SetATA0()", "TraceRoute");
-        Helper.Verify(new RequestDetails
+        reportRow.Wipe();
+        reportRow.ID= "TestCase00022";
+        reportRow.Command = "ATS=7";
+        sharedTests.TestCase_SetATA0();
+        log.TestCase("\\nTest Case: TestCase00026_Combined_VerifyThat_ATS_channableWhen_ATA0");
+        helper.Verify(new RequestDetails
         (
-            inputCommand: "ATS=7",
-            expectedTextContent: "SHUT: 7",
-            TAG: "ATA_ATS"
+            inputCommand: reportRow.Command,
+            expectedTextContent: "SHUT: 7"
         ));
     }
     [Test, Description("Verify that ATS changeable When_ATA1.")]
-    public static void TestCase00030_Combined_VerifyThat_ATS_NotChannableWhen_ATA1()
+    public void TestCase00023_Combined_VerifyThat_ATS_NotChannableWhen_ATA1()
     {
-        parameterizedTests.TestCase0023_Parameterized_SetATA1();
-        Logger.Write("has entered into TestCase00024Combined_VerifyThat_ATG_channableEhen_ATA1()", "TraceRoute");
-        Helper.Verify(new RequestDetails
+        reportRow.Wipe();
+        reportRow.ID= "TestCase00023";
+        reportRow.Command = "ATS=7";
+        sharedTests.TestCase_SetATA1();
+        log.TestCase("\\nTest Case: TestCase00027_Combined_VerifyThat_ATS_NotChannableWhen_ATA1");
+        helper.Verify(new RequestDetails
         (
-            inputCommand: "ATS=7",
-            expectedTextContent: "SHUT: 7",
-            TAG: "ATA0_ATS"
+            inputCommand: reportRow.Command,
+            expectedTextContent: "SHUT: 7"
         ));
     }
 
 
     [Test, Description("Verify that ATL changeable When_ATA0.")]
-    public static void TestCase00026_Combined_VerifyThat_ATL_channableWhen_ATA0()
+    public void TestCase00024_Combined_VerifyThat_ATL_channableWhen_ATA0()
     {//Max exp
-        parameterizedTests.TestCase0022_Parameterized_SetATA0();
-        Logger.Write("has entered into TestCase0001_Parameterized_SetATA0()", "TraceRoute");
-        Helper.Verify(new RequestDetails
+        reportRow.Wipe();
+        reportRow.ID= "TestCase00024";
+        sharedTests.TestCase_SetATA1();
+        log.TestCase("\\nTest Case: TestCase00028_Combined_VerifyThat_ATL_channableWhen_ATA0");
+        helper.Verify(new RequestDetails
         (
             inputCommand: "ATL=5",
-            expectedTextContent: "Max exp: ",
-            TAG: "ATA_ATL"
+            expectedTextContent: "Max exp: "
         ));
     }
     [Test, Description("Verify that ATL changeable When_ATA1.")]
-    public static void TestCase00027_Combined_VerifyThat_ATL_NotChannableWhen_ATA1()
+    public void TestCase00025_Combined_VerifyThat_ATL_NotChannableWhen_ATA1()
     {
-        parameterizedTests.TestCase0023_Parameterized_SetATA1();
-        Logger.Write("has entered into TestCase00024Combined_VerifyThat_ATG_channableEhen_ATA1()", "TraceRoute");
-        Helper.Verify(new RequestDetails
+        reportRow.Wipe();
+        reportRow.ID= "TestCase00025";
+        sharedTests.TestCase_SetATA1();
+        log.TestCase("\\nTest Case: TestCase00029_Combined_VerifyThat_ATL_NotChannableWhen_ATA1");
+        helper.Verify(new RequestDetails
         (
             inputCommand: "ATL=7",
-            expectedTextContent: "ERR",
-            TAG: "ATA1_ATL"
+            expectedTextContent: "ERR"
         ));
     }
 

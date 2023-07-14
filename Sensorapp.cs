@@ -1,64 +1,70 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
-using static simicon.automation.Utils.Enums;
-using Xamarin.Forms;
+﻿using simicon.automation.Tests;
 
 namespace simicon.automation;
 
-public static class Sensorapp
+public class Sensorapp : TestRun
 {
 
-
-    public static void UpdateSensorappProperty()
+    public void GetReady()
     {
-
-        Logger.Write("has entered into UpdateSensorappProperty", "TraceRoute");
-        Logger.Write("has entered into UpdateSensorappProperty", "sensorapp");
-        
-
-        string SensorappUdateRequest =
-        "sqlite3 /tftpboot/boot/conf/kris.sql3 \"insert or replace into tblSettings (tName,tValue) values ('SENSORAPP_MSENSORATPORT','')\"";
-
-
-        string SensorappSelectExpectedContent = "";
-        SshSocket.Send(SensorappUdateRequest, "");
-        SshSocket.Send(SensorappUdateRequest, SensorappSelectExpectedContent);
+        Response.Wipe();
+        remoteConsole.ExecuteBashCommand("cd /Bash &&./prepareSensorapp.sh");
+        log.Sensorapp($"Prepare Sensoeapp to work with automated testcaes;");
+        log.Sensorapp($"Prepare Sensoeapp sh script completed with exit code: {Response.ExitCode};");
+        if (Response.ExitCode == 0)
+        {
+            if (Response.output.Contains("ok: run: /service/sensorapp0:"))
+            {
+                log.Sensorapp("successfully completed.");
+                log.Sensorapp("SEnsorapp ready");
+            }
+        }
+        else
+        {
+            log.Failure("here will be implementer try count logic to complete sensorapp preparation");
+            Assert.Fail("try vount login not implrnterd yet here");
+        }
     }
+    //public void UpdateSensorappProperty()
+    //{
 
-    public static void VerifySensorappProperty()
-    {
-    Logger.Write("has entered into VerifySensorappProperty", "TraceRoute");
-    Logger.Write("has entered into VerifySensorappProperty", "sensorapp");
-    bool isExpcted = false;
-    bool isExit0 = false;
-        #region Verify value of updated Sensorapp Property
-        string SensorappSelectRequest = "sqlite3 /tftpboot/boot/conf/kris.sql3 \"select * from tblSettings\" | grep SENSORAPP_MSENSORATPORT";
-    string expectedContent = "SENSORAPP_MSENSORATPORT|";
-    SshSocket.Send(SensorappSelectRequest, expectedContent);
-    }
-    #endregion
+    //    log.Route("=====>Sensorapp<===== UpdateSensorappProperty");
 
-    public static void SensorappRestart()
-    {
+    //    //script line://cd /tftpboot/boot &&./prepareSensorapp.sh
 
-    Logger.Write("has entered into SensorappRestart", "TraceRoute");
-    Logger.Write("has entered into SensorappRestert", "sensorapp");
+    //    string SensorappUdateRequest =
+    //    "sqlite3 /tftpboot/boot/conf/kris.sql3 \"insert or replace into tblSettings (tName,tValue) values ('SENSORAPP_MSENSORATPORT','')\"";
 
-    #region Srvice Restart
-    string RestartQuery = "sv restart /service/sensorapp0";
-    string expectedContent = "ok: run: /service/sensorapp0:";
+    //    try
+    //    {
+    //        log.Sensorapp("attemptto update semsorapp property SENSORAPP_MSENSORATPORT to empty value.");
+    //        RemoteConsole.SendBashCommand("cd /tftpboot/boot/");
+    //        Response resp = RemoteConsole.GetResponseSSH(SensorappUdateRequest);
+    //        log.Debug($"SensorappUdateRequest exit code: {resp.ExitCode}");
+    //        log.Debug($"SensorappUdateRequest output: {resp.output}");
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        log.Failure($"Sensorapp.UpdateSensorappPropertycodeline 26 exception:{ex.ToString}");
+    //    }
+    //}
 
-    SshSocket.Send(RestartQuery, expectedContent);
+    //public void SensorappRestart()
+    //{
 
-    //TODO: processing sv restart sbed\ wait receive
-    //_dDeviceSSHSocket.Send(ConnectionPointers.DeviceSshSocket, SelectRequest, VerifyexpectedContent, VerificationType.Contains);
-    #endregion
-    }
+    //log.Route("has entered into SensorappRestert");
+
+    //#region Srvice Restart
+    //string RestartQuery = "sv restart /service/sensorapp0";
+    //string expectedContent = "ok: run: /service/sensorapp0:";
+
+    //RemoteConsole.Send("Sensorapp.SensorappRestart: ", RestartQuery, expectedContent);
+
+    ////TODO: processing sv restart sbed\ wait receive
+    ////_dDeviceSSHSocket.Send(ConnectionPointers.DeviceSshSocket, SelectRequest, VerifyexpectedContent, VerificationType.Contains);
+    //#endregion
+    //}
 
 
-        }// end of class Sensorapp
+}// end of class Sensorapp
 

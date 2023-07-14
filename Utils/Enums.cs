@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace simicon.automation.Utils;
 
-public static class Enums
+public class Enums
 {
 
     public enum VerificationType

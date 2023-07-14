@@ -1,110 +1,160 @@
-﻿using Renci.SshNet;
-using System.Diagnostics;
-using System.Runtime;
-using System.Runtime.CompilerServices;
-using static System.Net.Mime.MediaTypeNames;
+﻿
+using simicon.automation.Tests;
 
-namespace simicon.automation.Utils;
+namespace simicon.automation.Tests.Utils;
 
-public static class Logger
+public class Logger : ILogger
 {
-    private static string _userName = "";
-    private static string _launchDate = "";
-    private static string _parentCaller;
-    public static string _LogFolder = "";
-    private static string _logFile = "";
-    private static string prefix = "";
-    private static readonly object thisLock = new object();
-    public static string sTag = "stability";
-    public static string fTag = "failure";
-    public static string tTag = "TraceRoute";
+    public string _LogFolder = string.Empty;
+    private string _logFile = "";
+    public readonly object thisLock = new object();
+    private readonly string NewLine = Environment.NewLine;
+    private Snapshot _snapshots = new Snapshot();
+    private string launchDateTime;
+    private DataHeap testRunData = new DataHeap();
 
-    public static void InitLogger([CallerMemberName] string memberName = "", [CallerLineNumber] int codeLine = 0)
+    #region aliases for log file names by type
+    private readonly string _RouteTag = "TraceRoute";
+    private readonly string _WarningTag = "Warning";
+    private readonly string _FailureTag = "Failure";
+    private readonly string _ExceptionTag = "Exceptions";
+    private readonly string _InfoTag = "Info";
+    private readonly string _Snapshot = "Snapshots";
+    private readonly string _Testcase = "TesСase";
+    private readonly string _success = "success";
+    private readonly string _sendorapp = "sensorapp";
+    private readonly string _Networtk = "Network";
+    #endregion
+
+    public Logger()
+    {
+        launchDateTime = testRunData.launchDateTime;
+
+        InitLogger();
+    }
+
+    private void LogString(string Prefix, string message, string tag)
+    {
+        string logStr = Prefix + message;
+        Console.WriteLine(logStr + Environment.NewLine);
+        Write(logStr, tag);
+        Console.WriteLine(Prefix + message);
+    }
+    public void WhereLogs()
+    {
+        LogString("WhereLogs: ", _LogFolder, "WhereLogs");
+        LogString("WhereSnapshots: ", _snapshots.LocalSnapshotPath, "WhereLogs");
+    }
+    public void WhereLogs(string message)
+    {
+        LogString(message, _LogFolder, "WhereLogs");
+    }
+    public void Info(string message)
+    {
+        LogString("Info: ", message, _InfoTag);
+    }
+    public void Route(string message)
+    {
+        LogString("Route: ", message, _RouteTag);
+    }
+    public void Exception(string message)
+    {
+        LogString("EXCEPTION: ", message, _ExceptionTag);
+    }
+    public void Success(string message)
+    {
+        LogString("SUCCESS: ", message, _success);
+    }
+
+    public void Sensorapp(string message)
+    {
+        LogString("Sensorapp: ", message, _sendorapp);
+    }
+    public void Failure(string message)
+    {
+        LogString("FAILURE: ", message, _FailureTag);
+    }
+    public void Warning(string message)
+    {
+        LogString("WARNING: ", message, _WarningTag);
+    }   
+
+    public void SnapShot(string message)
+    {
+        LogString("Snapshot: ", message, _Snapshot);
+
+    }
+    public void TestCase(string message)
+    {
+        LogString("Tesst Case: ", NewLine + message, _Testcase);
+    }
+    public void Networtk(string message)
+    {
+        LogString("Connections: ", message, _Networtk);
+    }
+
+    public void InitLogger()
     {
 
         Write("has entered into InitLogger", "TraceRoute");
-
-#pragma warning disable CA1416
-        _launchDate = DateTime.Now.ToString("yyyy-MM-dd_hh-mm");
-        prefix = ":) " + DateTime.Now.ToString("yyyy-MM-dd hh:mm : ");
-        _userName = System.Security.Principal.WindowsIdentity.GetCurrent().Name.Split('\\')[1];
-        prefix = $"Call From {memberName}, code line {codeLine} at: " + DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
-        //_LogFilePath = $"F:\\AutomationLogs\\{launchDate}\\{_userName}\\";
-        _LogFolder = @"T:\AutomationLogs\" + _launchDate + '\\' + _userName;
-        _parentCaller = GetParentCaller();
-        _parentCaller = GetParentCaller();
-#       pragma warning restore  CA1416
+        _LogFolder = $"{Environment.CurrentDirectory}\\Logs\\{launchDateTime}\\";
+        //string _userName = "gitlab-ci";
+        //var currentDirectory = System.IO.Directory.GetCurrentDirectory();
+        //_LogFolder = Path.Combine(Env.LogsFolder,_launchDate);
+        Console.WriteLine($"WhERELogs: Logs Folder: {_LogFolder}");
+        //string _LogFolder = $"FILESRV\\public\\QA\\autotest_sw\\{_launchDate}\\{_userName}";
         var dirInfo = new DirectoryInfo(_LogFolder);
         if (!dirInfo.Exists)
         {
             Directory.CreateDirectory(_LogFolder);
+            testRunData.LogsFolder = _LogFolder;
         }
-    }
 
-    private static string GetParentCaller()
-    {
-        StackTrace stackTrace = new StackTrace();
-        StackFrame[] stackFrames = stackTrace.GetFrames();
-        if (stackFrames.Length > 1)
+        using (FileStream strm = File.Create("T:\\WhereLogs.txt"))
         {
-            _parentCaller = stackFrames.Skip(1).First().GetMethod().Name;
-            return _parentCaller;
+            using (StreamWriter sw = new StreamWriter(strm))
+            {
+                sw.WriteLine($"{_LogFolder}");
+            }
         }
-        return "logger";
+        WhereLogs();
     }
 
 
-    public static void Write(string message, string? TAG,
-                [CallerMemberName] string memberName = "",
-                [CallerFilePath] string sourceFilePath = "",
-                [CallerLineNumber] int codeLine = 0)
+    public string GetLogsFolder()
     {
-        _logFile = $"{_LogFolder}\\{TAG}.log";
+        return _LogFolder;
+    }
+
+    private void Write(string message, string TAG)
+    {
+        var DateStamp = DateTime.Now.ToString("yyyy-MM-dd;HH:mm:ss");
+
+        string Outputline = $"{DateStamp}: {message}";
+
+        _logFile = $"{_LogFolder}/{TAG}.log";
         bool lockTaken = false;
         try
         {
-            if (TryEnter(thisLock))
+            if (Monitor.TryEnter(thisLock))
             {
                 using StreamWriter sw = File.AppendText(_logFile);
                 {
-                    string lineprefix = $"Call From {memberName}, code line {codeLine} at: " + DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
-                    sw.WriteLine($"_>{lineprefix} : {message}");
+                    //string lineprefix = $"Call From {memberName}, code line {codeLine} at: " + DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
+                    sw.WriteLine($"{Outputline}");
                 }
-                //File.WriteAllText(_logFile, $"_>{prefix} : {message}");
+                //File.WriteAllText(_logFile, $"_>{LogPrefix} : {message}");
             }
         }
         finally
         {
             if (lockTaken)
             {
-                Exit(thisLock);
+                Monitor.Exit(thisLock);
                 lockTaken = false;
             }
         }
     }
 
-    //public static void Write(string message, string? TAG,
-    //        [CallerMemberName] string memberName = "",
-    //        //[CallerFilePath] string sourceFilePath = "",
-    //        [CallerLineNumber] int codeLine = 0)
-    //{
-    //    if (TAG == null)
-    //    {
-    //        TAG = memberName;
-    //    }
-    //    _logFile = $"{_LogFolder}\\{TAG}.log";
-
-    //    _launchDate = DateTime.Now.ToString("yyyy-MM-dd hh-mm");
-    //    string prefix = $"Call From {memberName}, code line {codeLine} at: " + DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
-    //    Console.WriteLine($"{TAG} {prefix} {message};");
-
-
-
-    //////////////////////////////////////////////////////////////////
-    /// swap stream to filestream
-    //////////////////////////////////////////////////////////////////
-
 
 }//end of class
-
-

@@ -1,11 +1,15 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
     <IsPackable>false</IsPackable>
+
+    <Configurations>Debug;Release;CshasrpJenkins;JenkinsCsharp</Configurations>
+
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,11 +25,13 @@
     <Compile Remove="Destination.cs" />
     <Compile Remove="Device.cs" />
     <Compile Remove="Entities.cs" />
+    <Compile Remove="Env.cs" />
     <Compile Remove="Envelope.cs" />
     <Compile Remove="ExchangeDataBuffer.cs" />
     <Compile Remove="Helper - bwckup 11-7-20222-19 before rollbeck to 10-28Copy.cs" />
     <Compile Remove="Helper.cs" />
     <Compile Remove="OutputVerification.cs" />
+    <Compile Remove="PrepareEnvironment.cs" />
     <Compile Remove="Protoype.cs" />
     <Compile Remove="SocketStream.cs" />
     <Compile Remove="StreamSocket.cs" />
@@ -33,19 +39,36 @@
     <Compile Remove="TestSuite.cs" />
     <Compile Remove="TestSuiteHelper.cs" />
     <Compile Remove="Tests\AutomationPrepareEnvironment.cs" />
+    <Compile Remove="Utils\AutomationPrepareEnvironment.cs" />
+    <Compile Remove="Utils\Globals.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
+    <None Remove="CI_Stages.png" />
+    <None Remove="SuccessException.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
     <PackageReference Include="NUnit" Version="3.13.3" />
-    <PackageReference Include="NUnit.Console" Version="3.16.0" />
-    <PackageReference Include="NUnit.ConsoleRunner" Version="3.16.0" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
-    <PackageReference Include="NUnit.Analyzers" Version="3.3.0" />
+    <PackageReference Include="NUnit.Console" Version="3.16.3" />
+    <PackageReference Include="NUnit.ConsoleRunner" Version="3.16.3" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.3.1" />
+    <PackageReference Include="NUnit.Analyzers" Version="3.6.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="coverlet.collector" Version="3.1.2" />
     <PackageReference Include="Renci.SshNet.Async" Version="1.4.0" />
+    <PackageReference Include="SharpYaml" Version="2.1.0" />
     <PackageReference Include="SSH.NET" Version="2020.0.2" />
     <PackageReference Include="Xamarin.Forms" Version="5.0.0.2515" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Credentials.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

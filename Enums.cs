@@ -1,8 +1,11 @@
-﻿namespace simicon.automation.Gen2;
+﻿namespace simicon.automation;
 
-public static class Enums
+public class Enums
 {
+    public Enums()
+    {
 
+    }
     public enum VerificationType
     {
         Equal,
@@ -16,5 +19,5 @@ public static class Enums
         BW,
         Undefined
     }
-
 }
+    

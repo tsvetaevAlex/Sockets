@@ -1,130 +1,167 @@
 ﻿
-namespace simicon.automation.Tests.NonParameterized;
+namespace simicon.automation.Tests;
 
-public static class SimpleTests
-{
-    [OneTimeSetUp, Description("ATG, Attempt to Prepare Environment")]
-    public static void PrepareTestEnvironment()
+public class SimpleTests : TestRun
+{ 
+    private DataHeap dataHeap = new DataHeap();
+    private readonly string logPrefix = "simicon.automation.Tests.Parameterized, COde line: ";
+
+
+    [Test, Description("get GetFirmwareVersion for report teble title.")]
+    public void TestCase0001_ATV_GetFirmwareVersion()
     {
-        Logger.Write("Wea are in SimpleTests.OneTimeSetUp.PrepareTestEnvironment", "TraceRoute");
+        // ATV == "Imx265-R v0.0.3 T29, hw 1.0 (c)23
+        //StartsWith("Imx") 
+
+        reportRow.Wipe();
+        reportRow.ID = "TestCase0001";
+        reportRow.Command = "ATV";
+        reportRow.TestCase = "TestCase0001_ATV_GetFirmwareVersion";
+        log.Route($"{reportRow.TestCase}");
+        reportRow.Description = "Verify that ATV command return firmware version and harware configuration";
+        log.TestCase($"{logPrefix}23 {reportRow.TestCase}");
+        log.TestCase($"Command:ATC; expexted Content should StartsWith 'imx' prefix;");
+        helper.Verify(new RequestDetails(
+            inputCommand: reportRow.Command,
+            expectedTextContent: "Imx:"
+        ));
     }
-
-
-    [SetUp]
-    public static void isEnvironmrntPrepared()
+    public void TestCase0002_AT2_GetSensorType()
     {
-        Logger.Write($"we are in [SetUp]; isEnvironmentPrepared: {Globals.isEnvironmentPrepared}.", "TraceRoute");
+        reportRow.Wipe();
+        reportRow.ID = "TestCase0002";
+        reportRow.Command = "AT2";
+        reportRow.Description = "Verify that AT2 command return sensor type expected:b/w or color.";
+        reportRow.TestCase = "TestCase0002_AT2_GetSensorType";
+        string cameraType = helper.ClarifySensorType();
+        if ((cameraType == "BW") || (cameraType == "Color"))
+        {
+            dataHeap.CameraType = cameraType;
+        }
+        Assert.That(((cameraType == "BW") || (cameraType == "Color")), Is.True);
     }
-
     [Test]
-    public static void TestCase0001_NonParameterized_ATC()
+    public void TestCase0003_ATC()
     {
-        Logger.Write("has entered into TestCase00001NonParameterized_ATC()", "TraceRoute");
-        Logger.Write("Command:ATC; expexted Text COntent:ApCorr; ", "ATC");
-        Helper.Verify(new RequestDetails(
-            inputCommand: "ATC",
-            expectedTextContent: "ApCorr: ",
-            TAG: "ATC"
+        log.WhereLogs();
+        reportRow.Command = "ATC";
+        reportRow.ID= "TestCase0003";
+        log.TestCase($"{logPrefix}> TestCase0001_ATC()");
+        log.TestCase($"Command:TestSuite3_ATC; expexted Content(Key words):'ApCorr';");
+        helper.Verify(new RequestDetails(
+            inputCommand: reportRow.Command,
+            expectedTextContent: "ApCorr:"
         ));
     }
 
     [Test]
-    public static void TestCase0002_NonParameterized_ATF()
-
+    public void TestCase0004_ATF()
     {
-        Logger.Write("has entered into TestCase00002_NonParameterized_ATF()", "TraceRoute");
-        Logger.Write("Command: ATF; Expected Text Content: Cam flip; ", "ATF");
-        Helper.Verify(new RequestDetails(
-            inputCommand: "ATF",
-            expectedTextContent: "Cam flip: ",
-            TAG: "ATF"
+        reportRow.Wipe();
+        reportRow.ID = "TestCase0004";
+        reportRow.Command = "ATF";
+        reportRow.Description = "Verify that ATF command current state of Flip property";
+        log.TestCase($"{logPrefix}: TestCase0003_ATF");
+        helper.Verify(new RequestDetails(
+            inputCommand: reportRow.Command,
+            expectedTextContent: "Cam flip: "
         ));
     }
+
     [Test]
-    public static void TestCase0003_NonParameterized_ATG()
+    public void TestCase0005_ATG()
     {
-        Logger.Write("has entered into TestCase00003_NonParameterized_ATG()", "TraceRoute");
-        Logger.Write("Command: ATG; Expected Text Content: GAIN: 480", "ATG");
-        Helper.Verify(new RequestDetails(
-            inputCommand: "ATG",
-            expectedTextContent: "GAIN: ",
-            TAG: "ATG")
-        );
+        reportRow.Wipe();
+        reportRow.ID= "TestCase0005";
+        reportRow.Command = "ATG";
+        reportRow.Description = "Verify that ATG command current state of Gain property";
+        log.TestCase($"{logPrefix}: TestCase0004_ATG");
+        helper.Verify(new RequestDetails(
+            inputCommand: reportRow.Command,
+            expectedTextContent: "GAIN: "
+            ));
     }
 
     [Test]
-    public static void TestCase0004_NonParameterized_ATJ()
-
+    public void TestCase0006_ATJ()
     {
-        Logger.Write("has entered into TestCase00004_NonParameterized_ATJ()", "TraceRoute");
-        Logger.Write("Commans: ATJ; Expected Text Content: Offset: ", "ATJ");
-        Helper.Verify(new RequestDetails(
-            inputCommand: "ATJ",
-            expectedTextContent: "Offset: ",
-            TAG: "ATJ"
+        reportRow.Wipe();
+        reportRow.ID= "TestCase0006";
+        reportRow.Command = "ATJ";
+
+        log.TestCase($"{logPrefix}: TestCase0005_ATJ" +
+            $"{logPrefix}.55 Command: ATJ; Expected text Keyword: Offset: ");
+        reportRow.Description = "Verify that ATJ command current state of brightness property";
+        reportRow.ID= "TestCase000z4";
+        helper.Verify(new RequestDetails(
+            inputCommand: reportRow.Command,
+            expectedTextContent: "Offset: "
             )
         );
     }
 
     [Test]
-    public static void TestCase0005_NonParameterized_ATK()
+    public void TestCase0007_ATK()
 
     {
-        Logger.Write("has entered into TestCase00005_NonParameterized_ATK()", "TraceRoute");
-        Logger.Write("Commnd: ATK; Expected Text Content: Hpoint; ", "ATK");
-        Helper.Verify(new RequestDetails(
-            inputCommand: "ATk",
-            expectedTextContent: "Hpoint: ",
-            TAG: "ATk"
+        reportRow.Wipe();
+        reportRow.ID= "TestCase0007";
+        reportRow.Command = "ATK";
+        reportRow.Description = "Verify that ATJ command current state of Average histogram level property";
+        log.TestCase($"{logPrefix}: TestCase0006_ATK");
+        reportRow.ID= "TestCase0005";
+        helper.Verify(new RequestDetails(
+            inputCommand: reportRow.Command,
+            expectedTextContent: "Hpoint: "
         ));
     }
 
     [Test]
-    public static void TestCase0005_1__ATK1_BelowLowBorder()
-
+    public void TestCase0008_ATL()
     {
-        Logger.Write("has entered into TestCase00052__ATK1_BelowLowBorder()", "TraceRoute");
-        Logger.Write("Commnd: ATK; Expected Text Content: Too low level,", "ATK1");
-        Helper.Verify(new RequestDetails(
-            inputCommand: "ATk1=50",
-            expectedTextContent: "Too low level,",
-            TAG: "ATk"
+        reportRow.Wipe();
+        reportRow.ID= "TestCase0008";
+        reportRow.Command = "ATL";
+        log.TestCase($"{logPrefix}: TestCase0007_ATL");
+        reportRow.Description = "Verify that ATJ command current state of max exposure for AGC property";
+        log.Route("Test Case: TestCase0006_ATL");  
+        log.TestCase("Commnd: ATL; Expected text Keyword: Max exp: ");
+        helper.Verify(new RequestDetails(
+            inputCommand: reportRow.Command,
+            expectedTextContent: "Max exp: "
         ));
     }
 
     [Test]
-    public static void TestCase0006_NonParameterized_ATL()
+    public void TestCase0009_ATP()
     {
-        Logger.Write("has entered into TestCase0006_NonParameterized_ATL()", "TraceRoute");
-        Logger.Write("Commnd: ATL; Expected Text Content: Max exp: ", "ATL");
-        Helper.Verify(new RequestDetails(
-            inputCommand: "ATL",
-            expectedTextContent: "Max exp: ",
-            TAG: "ATL"
+        reportRow.Wipe();
+        reportRow.ID= "TestCase0009";
+        reportRow.Description = "Verify that ATP command current state of exposure in uSe property";
+        reportRow.Command = "ATP";
+        log.TestCase($"{logPrefix}: TestCase0008_ATP");
+        log.Route("Test Case: TestCase0007_ATP");
+        log.TestCase("Commnd: ATP; Expected text Keyword: Cur exp: ");
+        helper.Verify(new RequestDetails(
+            inputCommand: reportRow.Command,
+            expectedTextContent: "Cur exp: "
         ));
     }
 
     [Test]
-    public static void TestCase0007_NonParameterized_ATP()
+    public void TestCase0010_ATS()
     {
-        Logger.Write("has entered into TestCase00007_NonParameterized_ATP()", "TraceRoute");
-        Logger.Write("Commnd: ATP; Expected Text Content: Cur exp: ", "ATP");
-        Helper.Verify(new RequestDetails(
-            inputCommand: "ATL",
-            expectedTextContent: "Cur exp: ",
-            TAG: "ATP"
+        reportRow.Wipe();
+        reportRow.ID= "TestCase0010";
+        reportRow.Command = "ATS";
+        reportRow.Description = "Verify that ATS command current state of exposure property";
+        log.TestCase($"\\n{logPrefix}.134 Test Case: TestCase0008_ATS");
+        log.Route("Test Case: TestCase0009_ATS");
+        log.TestCase($"\\n{logPrefix}.Command: ATS Expected text Keyword'SHUT: '");
+        helper.Verify(new RequestDetails(
+            inputCommand: reportRow.Command,
+            expectedTextContent: "SHUT: "
         ));
     }
 
-    [Test]
-    public static void TestCase0008_NonParameterized_ATS()
-    {
-        Logger.Write("has entered into TestCase00008_NonParameterized_ATS()", "TraceRoute");
-        Logger.Write("Command: ATS |expectedTextContent SHUT: | ATS", "");
-        Helper.Verify(new RequestDetails(
-            inputCommand: "ATS",
-            expectedTextContent: "SHUT: ",
-            TAG: "ATS"
-        ));
-    }
 }
