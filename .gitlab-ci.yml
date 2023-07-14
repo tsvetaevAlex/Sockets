@@ -1,0 +1,25 @@
+image: mcr.microsoft.com/dotnet/sdk:7.0
+
+variables:
+  GIT_STRATEGY: clone
+
+
+stages:
+  - tests                          
+
+test-automation:
+   stage: tests
+   script:
+    - echo "store login password into the DB with $USER $PASSWORD"
+    - echo "building..."
+    - git clone http://tsvetaev:kc71zsgb@192.168.2.51/qa/autotest_sw.git
+    - cd autotest_sw
+    - dotnet test  ./automation.sln -- NUnit.NumberOfTestWorkers=1
+   after_script:
+    - ls -la autotest_sw/bin/Debug/net7.0
+   artifacts:
+    paths:
+      - autotest_sw/bin/Debug/net7.0/Logs/
+      - autotest_sw/bin/Release/net7.0/Logs/
+    expire_in: 1 day
+    when: always

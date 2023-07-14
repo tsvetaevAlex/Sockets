@@ -1,64 +1,70 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using simicon.automation.Tests;
 
 namespace simicon.automation;
 
-public class Sensorapp
+public class Sensorapp : TestRun
 {
-    private TestSuite suite;
-    private Helper _helper;
-    public Sensorapp(ConnectionPointers cp)
+
+    public void GetReady()
     {
-        Console.WriteLine("!!!!!!!!!!!!!!Checkpoint Senoslapp  ConnectionPointers constructor");
-        _helper = new Helper(cp);
+        Response.Wipe();
+        remoteConsole.ExecuteBashCommand("cd /Bash &&./prepareSensorapp.sh");
+        log.Sensorapp($"Prepare Sensoeapp to work with automated testcaes;");
+        log.Sensorapp($"Prepare Sensoeapp sh script completed with exit code: {Response.ExitCode};");
+        if (Response.ExitCode == 0)
+        {
+            if (Response.output.Contains("ok: run: /service/sensorapp0:"))
+            {
+                log.Sensorapp("successfully completed.");
+                log.Sensorapp("SEnsorapp ready");
+            }
+        }
+        else
+        {
+            log.Failure("here will be implementer try count logic to complete sensorapp preparation");
+            Assert.Fail("try vount login not implrnterd yet here");
+        }
     }
+    //public void UpdateSensorappProperty()
+    //{
 
-    public void Prepare()
-    {
-        Console.WriteLine("!!!!!!!!!!!!!!Checkpoint SEnsorapp Prepare");
+    //    log.Route("=====>Sensorapp<===== UpdateSensorappProperty");
 
-        #region update Property
-        //TODO: move to here
-        Console.WriteLine("-------------------------------[Update SEnsorApp Property in DB]-------------------------------");
-        Envelope UpdateQuery = new Envelope(
-        testname: "SQL insert or replace",
-        request: "sqlite3 /tftpboot/boot/conf/kris.sql3 \"insert or replace into tblSettings (tName,tValue) values ('SENSORAPP_MSENSORATPORT','')\"",
-        expectedContent: "",
-        vt: VerificationType.None
-        );
-        _helper.Execute(UpdateQuery);
-        Console.WriteLine("-------------------------------[Update SEnsorApp Property in DB Completed]---------------------");
+    //    //script line://cd /tftpboot/boot &&./prepareSensorapp.sh
 
-        #endregion
+    //    string SensorappUdateRequest =
+    //    "sqlite3 /tftpboot/boot/conf/kris.sql3 \"insert or replace into tblSettings (tName,tValue) values ('SENSORAPP_MSENSORATPORT','')\"";
 
-        #region Verify Property
-        Console.WriteLine("-------------------------------[Verify SEnsorApp Property in DB]-------------------------------");
+    //    try
+    //    {
+    //        log.Sensorapp("attemptto update semsorapp property SENSORAPP_MSENSORATPORT to empty value.");
+    //        RemoteConsole.SendBashCommand("cd /tftpboot/boot/");
+    //        Response resp = RemoteConsole.GetResponseSSH(SensorappUdateRequest);
+    //        log.Debug($"SensorappUdateRequest exit code: {resp.ExitCode}");
+    //        log.Debug($"SensorappUdateRequest output: {resp.output}");
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        log.Failure($"Sensorapp.UpdateSensorappPropertycodeline 26 exception:{ex.ToString}");
+    //    }
+    //}
 
-        Envelope SelectQuery = new Envelope(
-            testname: "CamTest002",
-            request: "sqlite3 /tftpboot/boot/conf/kris.sql3 \"select * from tblSettings\" | grep SENSORAPP_MSENSORATPORT",
-        expectedContent: "SENSORAPP_MSENSORATPORT|",
-            vt: VerificationType.Equal
-            );
-        _helper.Execute(SelectQuery);
-        Console.WriteLine("-------------------------------[Verify SEnsorApp Property in DB Completed]---------------------");
-        #endregion
+    //public void SensorappRestart()
+    //{
 
-        #region Srvice Restart
-        Console.WriteLine("-------------------------------[Restart SEnsorApp Service]-------------------------------");
+    //log.Route("has entered into SensorappRestert");
 
-        Envelope RestartQuery = new Envelope(
-        testname: "CamTest004(sv restart /service/sensorapp0)",
-        request: "sv restart /service/sensorapp0",
-        expectedContent: "ok: run: /service/sensorapp0:",
-        vt: VerificationType.Contains
-        );
-        _helper.Execute(RestartQuery);
-        Console.WriteLine("-------------------------------[Restart SEnsorApp Serviceompleted]-----------------------");
-        #endregion
-    }// end of prepare
+    //#region Srvice Restart
+    //string RestartQuery = "sv restart /service/sensorapp0";
+    //string expectedContent = "ok: run: /service/sensorapp0:";
+
+    //RemoteConsole.Send("Sensorapp.SensorappRestart: ", RestartQuery, expectedContent);
+
+    ////TODO: processing sv restart sbed\ wait receive
+    ////_dDeviceSSHSocket.Send(ConnectionPointers.DeviceSshSocket, SelectRequest, VerifyexpectedContent, VerificationType.Contains);
+    //#endregion
+    //}
+
+
 }// end of class Sensorapp
 
